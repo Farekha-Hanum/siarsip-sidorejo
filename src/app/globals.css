@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7faf8;
+  --foreground: #1a3a28;
+
+  /* === SIMPEL NU Color Palette (Softer & Modern) === */
+  --nu-green-950:  #0f2518;
+  --nu-green-900:  #1a3a28;
+  --nu-green-800:  #1e5a3a;
+  --nu-green-700:  #22724a;
+  --nu-green-600:  #2d8c5a;
+  --nu-green-500:  #3da670;
+  --nu-green-400:  #5ec08a;
+  --nu-green-300:  #8ed4aa;
+  --nu-green-200:  #bee8cc;
+  --nu-green-100:  #e0f3e8;
+  --nu-green-50:   #f0f8f3;
+
+  --nu-gold-500:   #e0a820;
+  --nu-gold-400:   #ebc040;
+  --nu-gold-300:   #f0d06a;
+  --nu-gold-200:   #f5e4a0;
+  --nu-gold-100:   #fdf5d8;
+
+  --nu-soft-bg:    #f7faf8;
+  --nu-card-bg:    #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-bebas: var(--font-bebas-neue);
+  --font-sans: var(--font-inter);
+
+  /* NU Green Scale */
+  --color-nu-950:  var(--nu-green-950);
+  --color-nu-900:  var(--nu-green-900);
+  --color-nu-800:  var(--nu-green-800);
+  --color-nu-700:  var(--nu-green-700);
+  --color-nu-600:  var(--nu-green-600);
+  --color-nu-500:  var(--nu-green-500);
+  --color-nu-400:  var(--nu-green-400);
+  --color-nu-300:  var(--nu-green-300);
+  --color-nu-200:  var(--nu-green-200);
+  --color-nu-100:  var(--nu-green-100);
+  --color-nu-50:   var(--nu-green-50);
+
+  /* Gold accent */
+  --color-gold-500: var(--nu-gold-500);
+  --color-gold-400: var(--nu-gold-400);
+  --color-gold-300: var(--nu-gold-300);
+  --color-gold-200: var(--nu-gold-200);
+  --color-gold-100: var(--nu-gold-100);
+  
+  /* Soft Colors */
+  --color-sage: #2d8c5a;
+  --color-soft-blue: #60a5fa;
+  --color-soft-slate: #94a3b8;
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bebas;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* ===== SIMPEL NU Animations ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(45, 140, 90, 0.35); }
+  50%       { box-shadow: 0 0 0 12px rgba(45, 140, 90, 0); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+}
+
+.animate-float      { animation: float 3s ease-in-out infinite; }
+.animate-shimmer    { background-size: 200% auto; animation: shimmer 3s linear infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-spin-slow  { animation: spin-slow 8s linear infinite; }
+.animate-slide-up   { animation: slide-up 0.5s ease-out both; }
+.animate-orbit      { animation: orbit 6s linear infinite; }
+
+/* Scrollbar NU (soft) */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--nu-green-50); }
+::-webkit-scrollbar-thumb { background: var(--nu-green-300); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--nu-green-500); }
+
+/* Glassmorphism helpers */
+.glass-nu {
+  background: rgba(45, 140, 90, 0.06);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 140, 90, 0.1);
+}
+.glass-dark {
+  background: rgba(26, 58, 40, 0.65);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(77, 207, 143, 0.15);
+}
