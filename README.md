@@ -108,3 +108,13 @@ Setiap _push_ ke branch `main` menjalankan:
 - `npm run lint`
 - `npm run build`
 
+---
+
+**Pengembang**
+
+```
+NAMA  : SITI YULIA FAREKHA HANUM
+NIM   : 101230062
+KELAS : TF23B
+```
+
