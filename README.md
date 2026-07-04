@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SIARSIP-SIDOREJO
 
-## Getting Started
+**Arsip Surat Digital PR IPNU IPPNU Desa Sidorejo**
 
-First, run the development server:
+Aplikasi manajemen arsip surat digital untuk Pimpinan Ranting IPNU dan IPPNU Desa Sidorejo, Kecamatan Tirto, Kabupaten Pekalongan. Mengubah administrasi manual berbasis kertas menjadi _workflow_ digital yang terintegrasi.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Fitur
+
+- **Arsip Surat** — Penyimpanan dan pencarian arsip surat digital.
+- **Buat Surat** — Pembuatan surat resmi dengan _auto-numbering_ dan arsip digital.
+- **Scan OCR** — Pemindaian surat masuk dengan pembacaan teks otomatis.
+- **Manajemen Pengurus** — Data kepengurusan organisasi IPNU dan IPPNU.
+- **Inventaris** — Pencatatan aset dan perlengkapan organisasi.
+- **Daftar Kegiatan & Reward Anggota** — Pencatatan partisipasi kegiatan, validasi, _leaderboard_ skor, dan unduhan sertifikat.
+
+## Tech Stack
+
+| Kategori        | Teknologi                                              |
+| --------------- | ------------------------------------------------------ |
+| Framework       | Next.js 16, React 19, TypeScript                       |
+| Database & Auth | Supabase (Auth, PostgreSQL, Storage)                   |
+| Styling         | Tailwind CSS 4, Framer Motion, Lucide React            |
+| PDF & OCR       | pdf-lib, Tesseract.js                                  |
+| Lainnya         | react-signature-canvas, xlsx, clsx, tailwind-merge     |
+
+## Prasyarat
+
+- Node.js 20+
+- Akun [Supabase](https://supabase.com) (free tier cukup)
+
+## Variabel Lingkungan
+
+Buat file `.env.local` di root proyek:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Cara Menjalankan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cp .env.example .env.local   # lalu isi variabel lingkungan
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Buka [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## Setup Database
 
-To learn more about Next.js, take a look at the following resources:
+Jalankan SQL berikut di Supabase SQL Editor secara berurutan:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. `migration_schema.sql` — skema dasar
+2. `update_schema_v2.sql` — tambahan kolom dan tabel
+3. `update_schema_v3.sql` — jenis surat `digital` dan perbaikan RLS
+4. `update_data_pengurus.sql` — kolom NIA, organisasi, tanggal bergabung
+5. `fix_leaderboard_and_validation.sql` — _view_ leaderboard dan RLS
+6. `update_storage_rls.sql` — kebijakan storage bucket
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Struktur Proyek
 
-## Deploy on Vercel
+```
+src/
+├── app/                  # Halaman (App Router)
+│   ├── (auth)/           # Login & Register
+│   ├── admin/            # Dashboard admin
+│   └── user/             # Dashboard user
+├── actions/              # Server Actions (CRUD + auth)
+├── components/           # Komponen UI
+├── lib/                  # Utilitas & konfigurasi
+│   └── supabase/         # Klien Supabase (client & server)
+└── middleware.ts         # Proteksi rute + RBAC
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Role & Akses
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Admin
+- Kelola arsip surat, buat surat, scan OCR
+- Kelola pengurus, inventaris, kegiatan
+- Validasi partisipasi kegiatan anggota
+
+### User
+- Partisipasi kegiatan
+- Scan OCR surat masuk
+- Lihat daftar inventaris
+- Buat surat
+
+## Akun Testing
+
+Jalankan skema migrasi dulu, lalu:
+
+```bash
+node seed_users.mjs
+```
+
+| Role  | Email                       | Password   |
+| ----- | --------------------------- | ---------- |
+| Admin | `adminsimpelnu@gmail.com`   | `admin1234` |
+| User  | `putri.melati@gmail.com`    | `putri1234` |
+| User  | `ahmad.hanafi@gmail.com`    | `hanafi123` |
+
+## CI/CD
+
+Setiap _push_ ke branch `main` menjalankan:
+
+- `npm ci`
+- `npm run lint`
+- `npm run build`
+
