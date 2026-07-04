@@ -18,7 +18,7 @@ export async function submitKehadiran(formData: FormData) {
     .from("user_kegiatan")
     .insert({
       id_user: user.id,
-      id_kegiatan: parseInt(id_kegiatan),
+      id_kegiatan: parseInt(id_kegiatan) || 0,
       bukti_storage_path: null,
       status_validasi: "pending",
       skor_didapat: 0,

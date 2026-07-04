@@ -18,7 +18,7 @@ export async function upsertInventaris(formData: FormData) {
 
   const id = formData.get("id") as string;
   const nama_barang = formData.get("nama_barang") as string;
-  const jumlah = parseInt(formData.get("jumlah") as string);
+  const jumlah = parseInt(formData.get("jumlah") as string) || 0;
   const kondisi = formData.get("kondisi") as string;
   const keterangan = formData.get("keterangan") as string;
 

@@ -161,7 +161,7 @@ export default function UserKegiatanPage() {
                     <div className="flex items-center gap-3 mt-1.5">
                       <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
                         <Clock size={12} />
-                        {new Date(k.tanggal_kegiatan).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                        {(k.tanggal_kegiatan ? (() => { try { const d = new Date(k.tanggal_kegiatan); return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }); } catch { return "-"; } })() : "-")}
                       </div>
                       <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-[#fdf8e6] text-[#7a4f00] border border-[#f4c430]/10">
                         +{k.bobot_skor} POIN

@@ -142,7 +142,7 @@ export default function AdminValidationPage() {
                       <p className="font-bold text-sm" style={{ color: "#374151" }}>{s.kegiatan?.nama_kegiatan}</p>
                     </div>
                     <p className="text-[10px] mt-1.5 flex items-center gap-1.5" style={{ color: "#94a3b8" }}>
-                      <Clock size={12} /> Diajukan pada {new Date(s.created_at).toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      <Clock size={12} /> Diajukan pada {(s.created_at ? (() => { try { const d = new Date(s.created_at); return isNaN(d.getTime()) ? "-" : d.toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch { return "-"; } })() : "-")}
                     </p>
                   </div>
 

@@ -50,6 +50,15 @@ export default function ArsipView({ org }: { org: string }) {
     })();
   }, [org, refreshTrigger]);
 
+  if (!config) {
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      <div className="max-w-md text-center">
+        <h1 className="font-bebas text-4xl text-slate-800 mb-2">Organisasi Tidak Ditemukan</h1>
+        <p className="text-slate-500">Organisasi "{org}" tidak dikenal. Periksa URL atau pilih organisasi yang valid.</p>
+      </div>
+    </div>;
+  }
+
   if (isAdmin === false && basePath === "/user" && org === "all") {
      // Optional: allow users to see their own org archive? 
      // For now follow existing logic but refined.
@@ -74,7 +83,10 @@ export default function ArsipView({ org }: { org: string }) {
     const isIPNU = letter.kategori_dashboard === "ipnu" || letter.kategori_dashboard === "gabungan";
     const font = isIPNU ? "Arial, sans-serif" : "'Times New Roman', Times, serif";
     const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
+    if (!printWindow) {
+      alert("Izinkan popup untuk mendownload PDF. Periksa pengaturan popup blocker browser Anda.");
+      return;
+    }
 
     const html = `
       <html>
@@ -235,7 +247,7 @@ export default function ArsipView({ org }: { org: string }) {
                 <td className="p-5">
                   <p className="font-bold text-slate-800 text-sm leading-tight mb-1">{s.nomor_surat || "Tanpa Nomor"}</p>
                   <p className="text-xs text-slate-500 flex items-center gap-1.5">
-                    <Calendar size={12} /> {new Date(s.tanggal_surat).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}
+                    <Calendar size={12} /> {s.tanggal_surat ? (() => { try { const d = new Date(s.tanggal_surat); return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' }); } catch { return "-"; } })() : "-"}
                   </p>
                   <p className="text-xs text-slate-400 mt-1 italic line-clamp-1">{s.perihal}</p>
                 </td>

@@ -108,19 +108,27 @@ export default function EditorView({ org }: { org: string }) {
   useEffect(() => {
     fetchPengurus();
     // Load Auto-save Draft
-    const draft = localStorage.getItem(`draft_letter_${org}`);
-    if (draft && !editId) {
-      const data = JSON.parse(draft);
-      setTujuan(data.t || "");
-      setPerihal(data.p || "");
-      setIsSurat(data.i || "");
+    try {
+      const draft = localStorage.getItem(`draft_letter_${org}`);
+      if (draft && !editId) {
+        const data = JSON.parse(draft);
+        setTujuan(data.t || "");
+        setPerihal(data.p || "");
+        setIsSurat(data.i || "");
+      }
+    } catch {
+      // Ignore corrupt draft data
     }
   }, [org]);
 
   // Auto-save Logic
   useEffect(() => {
     if (tujuan || perihal || isiSurat) {
-      localStorage.setItem(`draft_letter_${org}`, JSON.stringify({ t: tujuan, p: perihal, i: isiSurat }));
+      try {
+        localStorage.setItem(`draft_letter_${org}`, JSON.stringify({ t: tujuan, p: perihal, i: isiSurat }));
+      } catch {
+        // Storage full or unavailable — skip auto-save
+      }
     }
   }, [tujuan, perihal, isiSurat]);
 
@@ -137,7 +145,11 @@ export default function EditorView({ org }: { org: string }) {
   const handleResetForm = () => {
     if(confirm("Hapus seluruh draf dan kosongkan form?")) {
       setTujuan(""); setPerihal(""); setIsSurat("");
-      localStorage.removeItem(`draft_letter_${org}`);
+      try {
+        localStorage.removeItem(`draft_letter_${org}`);
+      } catch {
+        // Ignore if localStorage unavailable
+      }
     }
   };
 
@@ -191,46 +203,61 @@ export default function EditorView({ org }: { org: string }) {
 
   function formatDate(dateStr: string) {
     if (!dateStr) return "-";
-    return new Date(dateStr).toLocaleDateString("id-ID", {
-      day: "numeric", month: "long", year: "numeric",
-    });
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "-";
+      return d.toLocaleDateString("id-ID", {
+        day: "numeric", month: "long", year: "numeric",
+      });
+    } catch {
+      return "-";
+    }
   }
 
   async function handleSave() {
     setSaving(true);
-    const result = await saveLetter({
-      nomor_surat: noSuratStr,
-      perihal,
-      jenis_surat: "digital",
-      tanggal_surat: ttdTanggal,
-      kategori_dashboard: org,
-      metadata: {
-        tujuan,
-        isi_surat: isiSurat,
-        kop: { tingkat: kopTingkat1, org: kopOrgText, sub: kopSubOrg, alamat: kopAlamat1, sekretariat: kopSekretariat, wilayah: kopWilayah },
-        tanggal_hijriah: ttdTanggalHijriah,
-        ttd_wilayah: ttdWilayah,
-        ttd1: { jabatan: ttd1Jabatan, nama: ttd1Nama, nia: ttd1Nia },
-        ttd2: { jabatan: ttd2Jabatan, nama: ttd2Nama, nia: ttd2Nia },
-        logos: { kiri: logoKiri, tengah: logoTengah, kanan: logoKanan }
-      },
-    });
+    try {
+      const result = await saveLetter({
+        nomor_surat: noSuratStr,
+        perihal,
+        jenis_surat: "digital",
+        tanggal_surat: ttdTanggal,
+        kategori_dashboard: org,
+        metadata: {
+          tujuan,
+          isi_surat: isiSurat,
+          kop: { tingkat: kopTingkat1, org: kopOrgText, sub: kopSubOrg, alamat: kopAlamat1, sekretariat: kopSekretariat, wilayah: kopWilayah },
+          tanggal_hijriah: ttdTanggalHijriah,
+          ttd_wilayah: ttdWilayah,
+          ttd1: { jabatan: ttd1Jabatan, nama: ttd1Nama, nia: ttd1Nia },
+          ttd2: { jabatan: ttd2Jabatan, nama: ttd2Nama, nia: ttd2Nia },
+          logos: { kiri: logoKiri, tengah: logoTengah, kanan: logoKanan }
+        },
+      });
 
-    if (result.error) {
-      alert(result.error);
+      if (result.error) {
+        alert(result.error);
+        setSaving(false);
+        return;
+      }
+      
       setSaving(false);
-      return;
+      setSuccess(`Surat berhasil dibuat! Nomor: ${result.nomorSurat}`);
+      try {
+        localStorage.removeItem(`draft_letter_${org}`);
+      } catch {
+        // Ignore if localStorage unavailable
+      }
+      
+      // Redirect otomatis ke arsip setelah 1.5 detik
+      setTimeout(() => {
+        const basePath = pathname.startsWith("/admin") ? "/admin" : "/user";
+        window.location.href = `${basePath}/surat-digital/${org}`;
+      }, 1500);
+    } catch {
+      alert("Terjadi kesalahan saat menyimpan surat. Silakan coba lagi.");
+      setSaving(false);
     }
-    
-    setSaving(false);
-    setSuccess(`Surat berhasil dibuat! Nomor: ${result.nomorSurat}`);
-    localStorage.removeItem(`draft_letter_${org}`);
-    
-    // Redirect otomatis ke arsip setelah 1.5 detik
-    setTimeout(() => {
-      const basePath = pathname.startsWith("/admin") ? "/admin" : "/user";
-      window.location.href = `${basePath}/surat-digital/${org}`;
-    }, 1500);
   }
 
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>, position: "kiri" | "tengah" | "kanan") {
@@ -251,7 +278,10 @@ export default function EditorView({ org }: { org: string }) {
     const previewEl = document.getElementById("letter-preview");
     if (!previewEl) return;
     const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
+    if (!printWindow) {
+      alert("Izinkan popup untuk mendownload PDF. Periksa pengaturan popup blocker browser Anda.");
+      return;
+    }
 
     printWindow.document.write(`
       <html>
@@ -278,6 +308,15 @@ export default function EditorView({ org }: { org: string }) {
   const headerFontClass = "var(--font-cinzel), serif";
   const footerFontClass = headerFontClass; // Samakan dengan KOP
   const headerColor = "#4dcf8f";
+
+  if (!config) {
+    return <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      <div className="max-w-md text-center">
+        <h1 className="font-bebas text-4xl text-slate-800 mb-2">Organisasi Tidak Ditemukan</h1>
+        <p className="text-slate-500">Organisasi "{org}" tidak dikenal. Periksa URL atau pilih organisasi yang valid.</p>
+      </div>
+    </div>;
+  }
 
   // Menu Pemilihan Jenis Surat (Jika belum memilih)
   if (!jenisSuratParam && !editId) {

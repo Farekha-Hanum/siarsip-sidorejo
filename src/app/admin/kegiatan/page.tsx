@@ -129,7 +129,7 @@ export default function AdminKegiatanPage() {
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#94a3b8" }}>Tanggal</span>
                   <p className="text-xs font-bold mt-0.5" style={{ color: "#475569" }}>
-                    {new Date(k.tanggal_kegiatan).toLocaleDateString("id-ID", { day: "numeric", month: "long" })}
+                    {(k.tanggal_kegiatan ? (() => { try { const d = new Date(k.tanggal_kegiatan); return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("id-ID", { day: "numeric", month: "long" }); } catch { return "-"; } })() : "-")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl font-bold text-sm"

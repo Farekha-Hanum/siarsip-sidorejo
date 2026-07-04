@@ -68,7 +68,7 @@ export default function AdminInventarisPage() {
       "Jumlah (Unit)": item.jumlah,
       "Kondisi": item.kondisi,
       "Keterangan": item.keterangan || "-",
-      "Ditambahkan Pada": new Date(item.created_at).toLocaleString("id-ID")
+      "Ditambahkan Pada": item.created_at ? (() => { try { const d = new Date(item.created_at); return isNaN(d.getTime()) ? "-" : d.toLocaleString("id-ID"); } catch { return "-"; } })() : "-"
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);

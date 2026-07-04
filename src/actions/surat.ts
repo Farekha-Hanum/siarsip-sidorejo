@@ -40,8 +40,8 @@ function parseIndonesianDate(dateStr: string): string {
     return `${year}-${month}-${day}`;
   }
 
-  // Fallback if parsing fails
-  return new Date().toISOString().split('T')[0];
+  // Return null if parsing fails — caller should handle
+  return "";
 }
 
 type EditableLetterPayload = {
@@ -230,7 +230,7 @@ export async function uploadScannedSurat(formData: FormData) {
       jenis_surat: "masuk_scan",
       nomor_surat: nomorSurat || "TANPA NOMOR",
       perihal: `[${jenisSurat || 'Surat'}] ${perihal || 'Tanpa Perihal'}`,
-      tanggal_surat: parseIndonesianDate(tanggal),
+      tanggal_surat: parseIndonesianDate(tanggal) || new Date().toISOString().split('T')[0],
       storage_path: uploadData.path,
       kategori_dashboard: kategoriDashboard,
       metadata: {

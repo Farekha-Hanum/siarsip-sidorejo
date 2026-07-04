@@ -61,7 +61,7 @@ export default function AdminDashboard() {
     if (recentSurat) {
       setRecentActivities(recentSurat.map(s => ({
         title: s.perihal,
-        time: new Date(s.created_at).toLocaleDateString("id-ID"),
+        time: s.created_at ? (() => { try { const d = new Date(s.created_at); return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("id-ID"); } catch { return "-"; } })() : "-",
         desc: "Dokumen berhasil diarsipkan ke dalam sistem.",
         color: NU_GREEN,
       })));
