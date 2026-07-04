@@ -104,6 +104,12 @@ export default function EditorView({ org }: { org: string }) {
     }
   }, [noSuratStr]);
 
+  async function fetchPengurus() {
+    const supabase = createClient();
+    const { data } = await supabase.from("data_pengurus").select("*").order("nama_lengkap");
+    if (data) setPengurus(data);
+  }
+
   // Load Initial Data (Draft or Pengurus)
   useEffect(() => {
     fetchPengurus();
@@ -131,12 +137,6 @@ export default function EditorView({ org }: { org: string }) {
       }
     }
   }, [tujuan, perihal, isiSurat]);
-
-  async function fetchPengurus() {
-    const supabase = createClient();
-    const { data } = await supabase.from("data_pengurus").select("*").order("nama_lengkap");
-    if (data) setPengurus(data);
-  }
 
   function isManualInput() {
     return perihal !== "" || tujuan !== "" || isiSurat !== "";

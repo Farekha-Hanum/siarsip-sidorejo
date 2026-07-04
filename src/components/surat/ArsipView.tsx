@@ -26,8 +26,9 @@ export default function ArsipView({ org }: { org: string }) {
 
   useEffect(() => {
     const supabase = createClient();
-    setLoading(true);
+    let cancelled = false;
     (async () => {
+      if (!cancelled) setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       const role = user?.user_metadata?.role || "user";
       setIsAdmin(role === "admin");
@@ -45,9 +46,12 @@ export default function ArsipView({ org }: { org: string }) {
       }
 
       const { data } = await query;
-      if (data) setLetters(data);
-      setLoading(false);
+      if (!cancelled) {
+        if (data) setLetters(data);
+        setLoading(false);
+      }
     })();
+    return () => { cancelled = true; };
   }, [org, refreshTrigger]);
 
   if (!config) {
