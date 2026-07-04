@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { LogIn, Mail, Lock, AlertCircle, Star, User as UserIcon, ShieldCheck } from "lucide-react";
+import { LogIn, Mail, Lock, AlertCircle, Star } from "lucide-react";
 import { login } from "@/actions/auth";
 
 export default function LoginPage() {
@@ -21,20 +21,9 @@ export default function LoginPage() {
         setLoading(false);
       }
     } catch (err) {
+      setError("Terjadi kesalahan tak terduga. Silakan coba lagi.");
       setLoading(false);
     }
-  };
-
-  const handleQuickLogin = (role: 'admin' | 'user') => {
-    const formData = new FormData();
-    if (role === 'admin') {
-      formData.append("email", "adminsimpelnu@gmail.com");
-      formData.append("password", "admin1234");
-    } else {
-      formData.append("email", "putri.melati@gmail.com");
-      formData.append("password", "putri1234");
-    }
-    handleFormAction(formData);
   };
 
   return (
@@ -265,35 +254,6 @@ export default function LoginPage() {
                 )}
               </motion.button>
             </form>
-
-            {/* Quick Login Buttons */}
-            <div className="mt-8 space-y-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-px flex-1 bg-white/10"></div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-white/30">Coba Cepat</span>
-                <div className="h-px flex-1 bg-white/10"></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('admin')}
-                  disabled={loading}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-[11px] font-bold transition-all hover:bg-white/10 text-white/60 border border-white/10"
-                >
-                  <ShieldCheck size={14} className="text-[#f4c430]" />
-                  Login Admin
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('user')}
-                  disabled={loading}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-[11px] font-bold transition-all hover:bg-white/10 text-white/60 border border-white/10"
-                >
-                  <UserIcon size={14} className="text-[#4dcf8f]" />
-                  Login User
-                </button>
-              </div>
-            </div>
 
             <div className="mt-6 pt-6 border-t border-white/10 text-center space-y-2">
               <p className="text-white/40 text-sm">

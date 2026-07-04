@@ -24,10 +24,15 @@ export async function saveLetter(payload: {
     return { error: "Anda harus login untuk membuat surat." };
   }
 
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat membuat surat." };
+  }
+
   // Save to database
   const { error: dbError } = await supabase.from("surat").insert({
     id_user: user.id,
-    jenis_surat: "keluar_otomatis",
+    jenis_surat: payload.jenis_surat || "keluar_otomatis",
     nomor_surat: payload.nomor_surat,
     perihal: payload.perihal,
     tanggal_surat: payload.tanggal_surat,

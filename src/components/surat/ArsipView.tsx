@@ -321,6 +321,7 @@ export default function ArsipView({ org }: { org: string }) {
                      <a 
                       href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/archives/${selectedLetter.storage_path}`}
                       target="_blank"
+                      rel="noopener noreferrer"
                       className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all"
                     >
                       <FileSearch size={20} /> Lihat Foto Scan

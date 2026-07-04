@@ -8,6 +8,20 @@ import { toRoman, getLetterCategory, getOrgConfig } from "@/lib/org-config";
  * Format: [NO]/[WILAYAH]/[KODE_KATEGORI]/[KODE_ORG]/[PERIODE]/[BULAN_ROMAN]/[TAHUN]
  * Example: 001/PR/SM/7455/XXIV/XI/2026
  */
+function formatLetterNumber(
+  seq: number,
+  wilayah: string,
+  category: { kode: string },
+  kodeOrg: string,
+  periode: string
+): string {
+  const seqStr = String(seq).padStart(3, "0");
+  const now = new Date();
+  const bulanRoman = toRoman(now.getMonth() + 1);
+  const tahun = now.getFullYear();
+  return `${seqStr}/${wilayah}/${category.kode}/${kodeOrg}/${periode}/${bulanRoman}/${tahun}`;
+}
+
 export async function generateLetterNumber(
   org: string,
   categorySlug: string
@@ -36,27 +50,42 @@ export async function generateLetterNumber(
     periode = settings.periode || periode;
   }
 
-  // Count existing letters in this org + category to determine the next number
-  const { count, error } = await supabase
-    .from("surat")
-    .select("id", { count: "exact", head: true })
-    .eq("kategori_dashboard", org)
-    .eq("sub_kategori", categorySlug);
+  const kodeOrg = config.kodeOrganisasi || "IPNU-IPPNU";
 
-  if (error) {
-    return { number: "", error: `Gagal menghitung nomor surat: ${error.message}` };
+  // Retry loop to handle race condition
+  const maxAttempts = 10;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const { count, error } = await supabase
+      .from("surat")
+      .select("id", { count: "exact", head: true })
+      .eq("kategori_dashboard", org)
+      .eq("sub_kategori", categorySlug);
+
+    if (error) {
+      return { number: "", error: `Gagal menghitung nomor surat: ${error.message}` };
+    }
+
+    const nextSeq = (count || 0) + 1;
+    const nomorSurat = formatLetterNumber(nextSeq, wilayah, category, kodeOrg, periode);
+
+    // Verify the number doesn't already exist (mitigates race condition)
+    const { data: existing } = await supabase
+      .from("surat")
+      .select("id")
+      .eq("nomor_surat", nomorSurat)
+      .maybeSingle();
+
+    if (!existing) {
+      return { number: nomorSurat };
+    }
   }
 
-  const nextSeq = (count || 0) + 1;
-  const seqStr = String(nextSeq).padStart(3, "0");
-
+  // Fallback: if all attempts fail, use timestamp-based number
+  const fallbackSeq = String(Date.now()).slice(-5);
   const now = new Date();
   const bulanRoman = toRoman(now.getMonth() + 1);
   const tahun = now.getFullYear();
-
-  const kodeOrg = config.kodeOrganisasi || "IPNU-IPPNU";
-
-  const nomorSurat = `${seqStr}/${wilayah}/${category.kode}/${kodeOrg}/${periode}/${bulanRoman}/${tahun}`;
+  const nomorSurat = `${fallbackSeq}/${wilayah}/${category.kode}/${kodeOrg}/${periode}/${bulanRoman}/${tahun}`;
 
   return { number: nomorSurat };
 }

@@ -170,6 +170,12 @@ export async function createOfficialLetter(formData: FormData, signatureData: st
 
 export async function getSignedUrl(path: string) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Anda harus login untuk mengakses file." };
+  }
+
   const { data, error } = await supabase.storage
     .from("archives")
     .createSignedUrl(path, 60); // 1 minute expiry
@@ -253,6 +259,11 @@ export async function updateSuratMetadata(formData: FormData) {
     return { error: "Anda harus login untuk memperbarui surat." };
   }
 
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat memperbarui surat." };
+  }
+
   const suratId = Number(formData.get("id"));
   const nomorSurat = (formData.get("nomor_surat") as string) || null;
   const perihal = formData.get("perihal") as string;
@@ -275,7 +286,8 @@ export async function updateSuratMetadata(formData: FormData) {
     return { error: `Gagal memperbarui surat: ${error.message}` };
   }
 
-  revalidatePath("/admin/surat");
+  revalidatePath("/admin/surat-digital", "layout");
+  revalidatePath("/user/surat-digital", "layout");
   return { success: "Data surat berhasil diperbarui." };
 }
 
@@ -285,6 +297,11 @@ export async function deleteSurat(suratId: number, storagePath?: string | null) 
 
   if (!user) {
     return { error: "Anda harus login untuk menghapus surat." };
+  }
+
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat menghapus surat." };
   }
 
   const { error: dbError } = await supabase
@@ -300,7 +317,8 @@ export async function deleteSurat(suratId: number, storagePath?: string | null) 
     await supabase.storage.from("archives").remove([storagePath]);
   }
 
-  revalidatePath("/admin/surat");
+  revalidatePath("/admin/surat-digital", "layout");
+  revalidatePath("/user/surat-digital", "layout");
   return { success: "Surat berhasil dihapus." };
 }
 
@@ -310,6 +328,11 @@ export async function regenerateOfficialLetterPdf(formData: FormData, signatureD
 
   if (!user) {
     return { error: "Anda harus login untuk memperbarui PDF surat." };
+  }
+
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat memperbarui PDF surat." };
   }
 
   const suratId = Number(formData.get("id"));
@@ -371,6 +394,7 @@ export async function regenerateOfficialLetterPdf(formData: FormData, signatureD
     return { error: `Gagal memperbarui data surat: ${updateError.message}` };
   }
 
-  revalidatePath("/admin/surat");
+  revalidatePath("/admin/surat-digital", "layout");
+  revalidatePath("/user/surat-digital", "layout");
   return { success: "PDF surat berhasil diperbarui." };
 }

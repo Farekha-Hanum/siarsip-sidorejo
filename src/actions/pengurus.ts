@@ -11,6 +11,11 @@ export async function upsertPengurus(formData: FormData) {
     return { error: "Anda harus login untuk mengelola data pengurus." };
   }
 
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat mengelola data pengurus." };
+  }
+
   const id = formData.get("id") as string;
   const nia = formData.get("nia") as string;
   const nama_lengkap = formData.get("nama_lengkap") as string;
@@ -56,6 +61,11 @@ export async function deletePengurus(id: number) {
 
   if (!user) {
     return { error: "Anda harus login." };
+  }
+
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat menghapus data pengurus." };
   }
 
   const { error } = await supabase

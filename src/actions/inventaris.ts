@@ -11,6 +11,11 @@ export async function upsertInventaris(formData: FormData) {
     return { error: "Anda harus login untuk mengelola inventaris." };
   }
 
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat mengelola inventaris." };
+  }
+
   const id = formData.get("id") as string;
   const nama_barang = formData.get("nama_barang") as string;
   const jumlah = parseInt(formData.get("jumlah") as string);
@@ -50,6 +55,11 @@ export async function deleteInventaris(id: number) {
 
   if (!user) {
     return { error: "Anda harus login." };
+  }
+
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat menghapus inventaris." };
   }
 
   const { error } = await supabase

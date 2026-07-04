@@ -41,17 +41,21 @@ export async function validatePartisipasi(id: number, status: "approved" | "reje
     return { error: "Unauthorized." };
   }
 
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat memvalidasi partisipasi." };
+  }
+
   // Ambil bobot skor dari kegiatan terkait jika disetujui
   let scoreToAward = 0;
   if (status === "approved") {
     const { data: participation } = await supabase
       .from("user_kegiatan")
-      .select("kegiatan(bobot_skor)")
+      .select("kegiatan_id, kegiatan:kegiatan_id(bobot_skor)")
       .eq("id", id)
       .single();
     
-    // @ts-ignore
-    scoreToAward = participation?.kegiatan?.bobot_skor || 0;
+    scoreToAward = (participation as { kegiatan?: { bobot_skor?: number } } | null)?.kegiatan?.bobot_skor || 0;
   }
 
   const { error } = await supabase

@@ -11,6 +11,11 @@ export async function upsertKegiatan(formData: FormData) {
     return { error: "Anda harus login untuk mengelola kegiatan." };
   }
 
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat mengelola kegiatan." };
+  }
+
   const id = formData.get("id") as string;
   const nama_kegiatan = formData.get("nama_kegiatan") as string;
   const tanggal_kegiatan = formData.get("tanggal_kegiatan") as string;
@@ -50,6 +55,11 @@ export async function deleteKegiatan(id: number) {
 
   if (!user) {
     return { error: "Anda harus login." };
+  }
+
+  const role = user?.user_metadata?.role;
+  if (role !== "admin") {
+    return { error: "Hanya admin yang dapat menghapus kegiatan." };
   }
 
   const { error } = await supabase
