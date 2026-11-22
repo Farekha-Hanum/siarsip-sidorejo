@@ -15,7 +15,7 @@ export default function Error({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h1 className="font-bebas text-4xl text-white tracking-tight mb-2">Terjadi Kesalahan</h1>
+        <h1 className="font-extrabold text-3xl text-white tracking-tight mb-2">Terjadi Kesalahan</h1>
         <p className="text-white/50 text-sm mb-8">
           Maaf, terjadi kesalahan yang tidak terduga. Silakan coba lagi.
         </p>

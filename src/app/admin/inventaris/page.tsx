@@ -39,7 +39,7 @@ export default function AdminInventarisPage() {
 
   async function fetchItems() {
     setLoading(true);
-    const { data } = await supabase.from("inventaris").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("inventaris").select("*").order("nama_barang", { ascending: true });
     if (data) setItems(data);
     setLoading(false);
   }
@@ -63,7 +63,8 @@ export default function AdminInventarisPage() {
   function handleExportExcel() {
     if (items.length === 0) return alert("Tidak ada data untuk diekspor");
     
-    const exportData = items.map(item => ({
+    const exportData = items.map((item, idx) => ({
+      "No.": idx + 1,
       "Nama Barang": item.nama_barang,
       "Jumlah (Unit)": item.jumlah,
       "Kondisi": item.kondisi,
@@ -87,7 +88,7 @@ export default function AdminInventarisPage() {
       >
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "#80e5b0" }}>✦ SIMPEL NU</p>
-          <h1 className="font-bebas text-4xl tracking-tight leading-none">Manajemen Inventaris</h1>
+          <h1 className="font-extrabold text-2xl md:text-3xl tracking-tight leading-snug">Manajemen Inventaris</h1>
           <p className="text-white/55 mt-1.5 text-sm">Pantau dan kelola aset organisasi ranting IPNU-IPPNU Sidorejo.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -118,7 +119,7 @@ export default function AdminInventarisPage() {
         ) : items.length === 0 ? (
           <div className="p-20 text-center flex flex-col items-center gap-4" style={{ color: "#94a3b8" }}>
             <Package size={64} className="opacity-20" />
-            <p className="font-bebas text-xl">Belum Ada Data Inventaris</p>
+            <p className="font-bold text-xl text-slate-700">Belum Ada Data Inventaris</p>
             <p className="text-sm">Klik tombol Tambah Barang untuk menambahkan aset pertama.</p>
           </div>
         ) : (
@@ -127,6 +128,7 @@ export default function AdminInventarisPage() {
               <thead>
                 <tr className="text-[10px] uppercase font-bold tracking-widest"
                   style={{ background: "rgba(240,250,244,0.7)", color: "#64748b", borderBottom: "1px solid rgba(31,154,94,0.08)" }}>
+                  <th className="px-4 py-4 text-center w-12">No.</th>
                   <th className="px-7 py-4">Nama Barang</th>
                   <th className="px-7 py-4">Jumlah</th>
                   <th className="px-7 py-4">Kondisi</th>
@@ -148,6 +150,7 @@ export default function AdminInventarisPage() {
                       onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(240,250,244,0.6)")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                     >
+                      <td className="px-4 py-5 text-center text-sm font-semibold" style={{ color: "#94a3b8" }}>{i + 1}</td>
                       <td className="px-7 py-5 font-bold" style={{ color: NU_DARK }}>{item.nama_barang}</td>
                       <td className="px-7 py-5 font-medium" style={{ color: "#475569" }}>{item.jumlah} Unit</td>
                       <td className="px-7 py-5">
@@ -205,7 +208,7 @@ export default function AdminInventarisPage() {
                   <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#80e5b0" }}>
                     {editingItem ? "Edit Data" : "Tambah Baru"}
                   </p>
-                  <h2 className="font-bebas text-2xl text-white tracking-tight">
+                  <h2 className="font-bold text-xl text-white tracking-tight">
                     {editingItem ? "Edit Barang" : "Tambah Barang Baru"}
                   </h2>
                 </div>

@@ -11,7 +11,7 @@ BEGIN
     END IF;
 END $$;
 
--- 2. Hapus dan Buat Ulang View Leaderboard agar lebih akurat
+-- 2. Hapus dan Buat Ulang View Leaderboard agar lebih akurat (Kecualikan akun Admin)
 DROP VIEW IF EXISTS public.view_leaderboard;
 CREATE VIEW public.view_leaderboard WITH (security_invoker = true) AS
 SELECT 
@@ -19,13 +19,16 @@ SELECT
     p.nama_lengkap,
     p.username,
     p.organisasi,
+    p.role,
     COALESCE(SUM(uk.skor_didapat), 0) as total_skor
 FROM 
     public.profiles p
 LEFT JOIN 
     public.user_kegiatan uk ON p.id = uk.id_user AND uk.status_validasi = 'approved'
+WHERE 
+    p.role != 'admin' AND LOWER(p.nama_lengkap) NOT LIKE '%admin%'
 GROUP BY 
-    p.id, p.nama_lengkap, p.username, p.organisasi;
+    p.id, p.nama_lengkap, p.username, p.organisasi, p.role;
 
 -- 3. Matikan sementara RLS pada tabel krusial
 ALTER TABLE public.user_kegiatan DISABLE ROW LEVEL SECURITY;

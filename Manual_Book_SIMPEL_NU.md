@@ -150,13 +150,16 @@ Fitur ini digunakan untuk memantau keaktifan anggota melalui sistem poin.
 [SCREENSHOT: Halaman Daftar Kegiatan bagi User]
 
 #### Bagi Admin:
-1.  Buka menu **"Reward Anggota"**.
-2.  Tinjau daftar kehadiran yang diajukan oleh pengurus.
+1.  **Daftar Kegiatan & Partisipasi**: Buka menu **"Kegiatan"** (`/admin/kegiatan`) untuk melihat seluruh agenda, membuat kegiatan baru, serta memantau kartu statistik tiap kegiatan.
+    *   **Ekspor Rekap Excel**: Tombol **"Ekspor Rekap (.xlsx)"** di bagian atas untuk mengunduh seluruh data kegiatan beserta persentase partisipasi dan rincian kehadiran dalam format spreadsheet Excel.
+    *   **Lihat Daftar Peserta**: Klik tombol **"Lihat Daftar Peserta"** pada kartu kegiatan untuk melihat rincian anggota, memfilter status (Hadir, Menunggu, Ditolak), serta mengunduh daftar peserta kegiatan tersebut ke format Excel melalui tombol **"Unduh Excel (.xlsx)"**.
+    *   Melihat **Tingkat Partisipasi Ranting** dan **Persentase Keberhasilan Konfirmasi (Rasio Valid)** secara otomatis.
+2.  **Validasi Kegiatan**: Buka menu **"Validasi Kegiatan"** (`/admin/validasi`) untuk meninjau dan menyetujui antrean bukti kehadiran anggota yang masuk secara cepat.
 3.  Klik **"Approve"** untuk memberikan poin secara otomatis ke profil anggota tersebut.
-[SCREENSHOT: Panel Validasi Kehadiran bagi Admin]
+[SCREENSHOT: Panel Daftar Kegiatan & Rincian Peserta bagi Admin]
 
 #### Leaderboard:
-Setiap kehadiran bernilai poin tertentu. Anggota yang mencapai target **70 Poin** akan mendapatkan gelar **"Anggota Terbest"** dan berhak mendapatkan sertifikat digital otomatis dari sistem.
+Setiap kehadiran bernilai poin tertentu. Anggota yang mencapai target **70 Poin** akan mendapatkan gelar **"Anggota Tergiat"** dan berhak mendapatkan sertifikat digital otomatis dari sistem.
 [SCREENSHOT: Papan Peringkat / Leaderboard Anggota]
 
 ### 3.4 Pengaturan & Profil

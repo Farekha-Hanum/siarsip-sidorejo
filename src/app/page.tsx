@@ -46,8 +46,8 @@ export default function Home() {
             <Image src="/logo-baru.png" alt="Logo SIMPEL NU" width={40} height={40} className="object-cover" />
           </div>
           <div>
-            <span className="font-bebas text-2xl text-white tracking-widest">SIMPEL NU</span>
-            <span className="block text-[10px] text-[#80e5b0] tracking-widest uppercase font-medium -mt-1">Sidorejo</span>
+            <span className="font-extrabold text-xl text-white tracking-wider">SIMPEL NU</span>
+            <span className="block text-[10px] text-[#80e5b0] tracking-widest uppercase font-medium -mt-0.5">Sidorejo</span>
           </div>
         </motion.div>
         <motion.div
@@ -82,7 +82,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-6xl md:text-8xl font-bebas text-white tracking-tight leading-none mb-4"
+              className="text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-none mb-4"
             >
               SIMPEL{" "}
               <span
@@ -193,7 +193,7 @@ export default function Home() {
             { value: "Digital", label: "Arsip & Kegiatan Online" },
           ].map((s, i) => (
             <div key={i}>
-              <p className="font-bebas text-2xl md:text-3xl text-[#f4c430] tracking-wide">{s.value}</p>
+              <p className="font-extrabold text-2xl text-[#f4c430] tracking-wide">{s.value}</p>
               <p className="text-[#80e5b0] text-[10px] leading-tight mt-1 font-medium uppercase tracking-widest">{s.label}</p>
             </div>
           ))}
@@ -210,7 +210,7 @@ export default function Home() {
             className="text-center mb-12"
           >
             <span className="text-[#f4c430] font-bold text-sm uppercase tracking-widest">Fitur Unggulan</span>
-            <h2 className="font-bebas text-5xl text-white mt-2 tracking-tight">Semua dalam Satu Platform</h2>
+            <h2 className="font-extrabold text-3xl md:text-4xl text-white mt-2 tracking-tight">Semua dalam Satu Platform</h2>
             <p className="text-white/50 mt-3">Didesain khusus untuk kebutuhan ranting IPNU-IPPNU</p>
           </motion.div>
 
@@ -253,7 +253,7 @@ export default function Home() {
                 >
                   <feat.icon size={26} className="text-white" />
                 </div>
-                <h3 className="font-bebas text-2xl text-white mb-3 tracking-tight">{feat.title}</h3>
+                <h3 className="font-bold text-xl text-white mb-2 tracking-tight">{feat.title}</h3>
                 <p className="text-white/50 text-sm leading-relaxed">{feat.desc}</p>
               </motion.div>
             ))}
@@ -266,7 +266,7 @@ export default function Home() {
         <div className="flex items-center justify-center gap-2 mb-3">
           <Zap size={14} className="text-[#f4c430]" />
           <span className="text-white/40 text-xs tracking-widest uppercase">
-            © 2025 PRNU Sidorejo — SIMPEL NU
+            © 2026 - PR IPNU IPPNU Sidorejo - SIMPEL NU
           </span>
         </div>
         <p className="text-white/20 text-xs">Dibangun dengan ❤ untuk pelajar Nahdlatul Ulama</p>

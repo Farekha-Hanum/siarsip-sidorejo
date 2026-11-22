@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { logout } from "@/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 
 interface LogoutButtonProps {
   collapsed?: boolean;
@@ -16,7 +17,18 @@ export default function LogoutButton({ collapsed, className, variant = "sidebar"
   async function handleLogout() {
     if (confirm("Apakah Anda yakin ingin keluar?")) {
       setLoading(true);
-      await logout();
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.error("Client signout error:", e);
+      }
+      try {
+        await logout();
+      } catch (e) {
+        // server redirect can throw NEXT_REDIRECT
+      }
+      window.location.href = "/login";
     }
   }
 

@@ -1,6 +1,6 @@
 import { createWorker } from "tesseract.js";
 
-export async function performOCR(imageFile: File | string, onProgress?: (progress: number) => void) {
+export async function performOCR(imageFile: File | string, _onProgress?: (progress: number) => void) {
   const worker = await createWorker("ind+eng");
   
   try {
@@ -21,8 +21,8 @@ export function extractSuratData(text: string) {
     tanggal: /(\d{1,2}\s+(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember)\s+\d{4})/i,
     perihal: /Perihal\s*:\s*([^\n\r]+)/i,
     pengirim: /Pengirim\s*:\s*([^\n\r]+)/i,
-    // Jenis surat biasanya dideteksi dari judul atau sapaan
-    jenis: /(Surat Undangan|Surat Edaran|Surat Keterangan|Surat Masuk)/i,
+    // Jenis surat dideteksi dari judul atau sapaan
+    jenis: /(Surat Tugas|Surat Mandat|Surat Undangan|Surat Permohonan|Proposal|LPJ|Surat Keterangan|Surat Instruksi|Surat Masuk)/i,
   };
 
   const results = {

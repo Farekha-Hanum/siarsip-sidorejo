@@ -22,12 +22,14 @@ export type OrgConfig = {
   // Header Defaults
   tingkat1: string;
   orgText: string;
+  orgText2?: string;
   subOrg: string;
   alamat1: string;
   wilayah: string;
   sekretariat?: string;
   kontakWa?: string;
   kontakEmail?: string;
+  kontakWebsite?: string;
 };
 
 export const ORG_CONFIGS: Record<OrgType, OrgConfig> = {
@@ -42,8 +44,8 @@ export const ORG_CONFIGS: Record<OrgType, OrgConfig> = {
     tingkat1: "PIMPINAN RANTING",
     orgText: "IKATAN PELAJAR NAHDLATUL ULAMA",
     subOrg: "DESA SIDOREJO",
-    alamat1: "KECAMATAN PAGERWOJO",
-    wilayah: "TULUNGAGUNG",
+    alamat1: "KECAMATAN TIRTO",
+    wilayah: "PEKALONGAN",
     sekretariat: "Sekretariat: Gedung NU Sidorejo Lt. 1",
     kontakWa: "08123456789",
     kontakEmail: "ipnu.sidorejo@gmail.com",
@@ -65,8 +67,8 @@ export const ORG_CONFIGS: Record<OrgType, OrgConfig> = {
     tingkat1: "PIMPINAN RANTING",
     orgText: "IKATAN PELAJAR PUTRI NAHDLATUL ULAMA",
     subOrg: "DESA SIDOREJO",
-    alamat1: "KECAMATAN PAGERWOJO",
-    wilayah: "TULUNGAGUNG",
+    alamat1: "KECAMATAN TIRTO",
+    wilayah: "PEKALONGAN",
     sekretariat: "Sekretariat: Gedung NU Sidorejo Lt. 2",
     kontakWa: "08987654321",
     kontakEmail: "ippnu.sidorejo@gmail.com",
@@ -81,20 +83,29 @@ export const ORG_CONFIGS: Record<OrgType, OrgConfig> = {
     type: "gabungan",
     name: "Gabungan",
     fullName: "IPNU-IPPNU",
-    logo: "/logo-baru.png",
-    kodeOrganisasi: "",
+    logo: "/logo-binari.png",
+    kodeOrganisasi: "IPNU-IPPNU",
     color: "#2d8c5a",
     colorLight: "#e8f5ee",
-    tingkat1: "PIMPINAN RANTING GABUNGAN",
-    orgText: "IPNU - IPPNU",
+    tingkat1: "PANITIA KEGIATAN",
+    orgText: "IKATAN PELAJAR NAHDLATUL ULAMA",
+    orgText2: "IKATAN PELAJAR PUTRI NAHDLATUL ULAMA",
     subOrg: "DESA SIDOREJO",
-    alamat1: "KECAMATAN PAGERWOJO",
-    wilayah: "TULUNGAGUNG",
-    sekretariat: "Sekretariat: Gedung NU Sidorejo",
+    alamat1: "KECAMATAN TIRTO",
+    wilayah: "PEKALONGAN",
+    sekretariat: "Jl. Raya Sidorejo Rt.05 Rw.02 No.33 Kec. Tirto Kab. Pekalongan 51151",
+    kontakWa: "088291260072 / 0882006754145",
+    kontakEmail: "ipnuippnusidorejotirto@gmail.com",
+    kontakWebsite: "ipnuippnusidorejo.or.id",
     letterCategories: [
-      { slug: "proposal-kegiatan", label: "Proposal Kegiatan", kode: "PK" },
-      { slug: "undangan", label: "Undangan", kode: "U" },
-      { slug: "laporan-pertanggungjawaban", label: "Laporan Pertanggungjawaban", kode: "LPJ" },
+      { slug: "permohonan-pemateri", label: "Permohonan Menjadi Pemateri", kode: "PMP" },
+      { slug: "undangan", label: "Undangan", kode: "UND" },
+      { slug: "pemberitahuan-kegiatan", label: "Pemberitahuan Kegiatan", kode: "PBK" },
+      { slug: "izin-tempat", label: "Permohonan Izin Tempat & Fasilitas", kode: "PIT" },
+      { slug: "izin-orang-tua", label: "Pemberitahuan & Izin Orang Tua", kode: "PIO" },
+      { slug: "permohonan-konsumsi", label: "Permohonan Konsumsi / Bantuan", kode: "PKN" },
+      { slug: "proposal-kegiatan", label: "Proposal Kegiatan", kode: "PRP" },
+      { slug: "laporan-pertanggungjawaban", label: "Laporan Pertanggungjawaban (LPJ)", kode: "LPJ" },
     ],
   },
 };

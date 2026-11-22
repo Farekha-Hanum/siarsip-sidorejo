@@ -12,13 +12,30 @@ export async function submitKehadiran(formData: FormData) {
   }
 
   const id_kegiatan = formData.get("id_kegiatan") as string;
+  const parsedId = parseInt(id_kegiatan) || 0;
+
+  if (!parsedId) {
+    return { error: "ID kegiatan tidak valid." };
+  }
+
+  // 1. Cek apakah user sudah pernah submit kegiatan ini (Mencegah duplikasi data saat input bersamaan)
+  const { data: existing } = await supabase
+    .from("user_kegiatan")
+    .select("id, status_validasi")
+    .eq("id_user", user.id)
+    .eq("id_kegiatan", parsedId)
+    .maybeSingle();
+
+  if (existing) {
+    return { error: "Anda sudah melakukan konfirmasi kehadiran untuk kegiatan ini." };
+  }
 
   // 2. Simpan ke Database
   const { error: dbError } = await supabase
     .from("user_kegiatan")
     .insert({
       id_user: user.id,
-      id_kegiatan: parseInt(id_kegiatan) || 0,
+      id_kegiatan: parsedId,
       bukti_storage_path: null,
       status_validasi: "pending",
       skor_didapat: 0,
@@ -51,11 +68,20 @@ export async function validatePartisipasi(id: number, status: "approved" | "reje
   if (status === "approved") {
     const { data: participation } = await supabase
       .from("user_kegiatan")
-      .select("kegiatan_id, kegiatan:kegiatan_id(bobot_skor)")
+      .select("id_kegiatan, kegiatan(bobot_skor)")
       .eq("id", id)
       .single();
     
-    scoreToAward = (participation as { kegiatan?: { bobot_skor?: number } } | null)?.kegiatan?.bobot_skor || 0;
+    if ((participation as any)?.kegiatan?.bobot_skor) {
+      scoreToAward = (participation as any).kegiatan.bobot_skor;
+    } else if (participation?.id_kegiatan) {
+      const { data: keg } = await supabase
+        .from("kegiatan")
+        .select("bobot_skor")
+        .eq("id", participation.id_kegiatan)
+        .single();
+      scoreToAward = keg?.bobot_skor || 10;
+    }
   }
 
   const { error } = await supabase
@@ -69,6 +95,7 @@ export async function validatePartisipasi(id: number, status: "approved" | "reje
   if (error) return { error: error.message };
 
   revalidatePath("/admin/validasi");
+  revalidatePath("/admin/kegiatan");
   revalidatePath("/user"); // Untuk update leaderboard
   return { success: `Partisipasi berhasil di-${status}!` };
 }

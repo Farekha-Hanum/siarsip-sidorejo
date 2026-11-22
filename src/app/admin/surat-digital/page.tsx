@@ -48,7 +48,7 @@ export default function SuratSelectorPage() {
           <Star size={14} fill="#f4c430" className="text-[#f4c430]" />
           <span className="text-xs font-bold uppercase tracking-widest">Digital Letter Editor</span>
         </motion.div>
-        <h1 className="text-5xl font-bebas text-[#0d3320] tracking-tight">Pilih Kategori Surat</h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-[#0d3320] tracking-tight">Pilih Kategori Surat</h1>
         <p className="text-slate-500 max-w-2xl mx-auto">
           Silakan pilih organisasi tujuan pembuatan surat digital. Sistem akan otomatis menyesuaikan KOP surat, 
           penomoran, dan arsip sesuai dengan pilihan Anda.
@@ -78,7 +78,7 @@ export default function SuratSelectorPage() {
             </div>
 
             <div className="space-y-2 flex-1">
-              <h2 className="text-3xl font-bebas text-[#0d3320] tracking-wide">{cat.name}</h2>
+              <h2 className="text-2xl font-bold text-[#0d3320] tracking-tight">{cat.name}</h2>
               <p className="text-[10px] font-bold uppercase text-green-600 tracking-widest">{cat.fullName}</p>
               <p className="text-sm text-slate-500 leading-relaxed mt-4">
                 {cat.desc}

@@ -8,6 +8,7 @@ import {
   Scan,
   ClipboardList,
   Trophy,
+  ShieldCheck,
   LogOut,
   Menu,
   X,
@@ -64,7 +65,7 @@ const sidebarItems = [
   },
   { icon: Scan,            label: "Scanner OCR",        href: "/admin/scanner" },
   { icon: ClipboardList,   label: "Inventaris",         href: "/admin/inventaris" },
-  { icon: Trophy,          label: "Reward Anggota",     href: "/admin/validasi" },
+  { icon: ShieldCheck,     label: "Validasi Kegiatan",  href: "/admin/validasi" },
   { icon: LayoutDashboard, label: "Daftar Kegiatan",    href: "/admin/kegiatan" },
 ];
 
@@ -125,7 +126,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <Image src="/logo-baru.png" alt="Logo" width={36} height={36} className="object-cover" />
                 </div>
                 <div className="overflow-hidden">
-                  <p className="font-bebas text-xl text-white tracking-widest leading-none">SIMPEL NU</p>
+                  <p className="font-extrabold text-lg text-white tracking-wide leading-none">SIMPEL NU</p>
                   <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: NU_LIGHT }}>
                     Panel Admin
                   </p>
@@ -285,7 +286,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "#1f9a5e" }}>
               Panel Administrasi · SIMPEL NU
             </p>
-            <h2 className="font-bebas text-2xl text-[#0d3320] tracking-tight leading-none">{currentPage}</h2>
+            <h2 className="font-extrabold text-xl text-[#0d3320] tracking-tight leading-none">{currentPage}</h2>
           </div>
 
           <div className="flex items-center gap-3">

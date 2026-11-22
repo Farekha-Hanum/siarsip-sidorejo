@@ -9,8 +9,8 @@ export default function NotFound() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h1 className="font-bebas text-6xl text-white tracking-tight mb-2">404</h1>
-        <p className="font-bebas text-2xl text-white/70 tracking-tight mb-2">Halaman Tidak Ditemukan</p>
+        <h1 className="font-extrabold text-5xl text-white tracking-tight mb-2">404</h1>
+        <p className="font-bold text-xl text-white/90 tracking-tight mb-2">Halaman Tidak Ditemukan</p>
         <p className="text-white/40 text-sm mb-8">
           Halaman yang Anda cari tidak ada atau telah dipindahkan.
         </p>

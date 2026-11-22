@@ -91,7 +91,7 @@ export default function RegisterPage() {
               <Star size={12} fill={NU_GOLD} style={{ color: NU_GOLD }} />
               <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: NU_LIGHT }}>Bergabung Sekarang</span>
             </div>
-            <h1 className="font-bebas text-4xl text-white tracking-tight">Daftar Akun Baru</h1>
+            <h1 className="font-extrabold text-2xl md:text-3xl text-white tracking-tight">Daftar Akun Baru</h1>
             <p className="text-white/45 text-sm mt-1">
               Bergabunglah dengan SIMPEL NU untuk mulai berpartisipasi di kegiatan ranting.
             </p>

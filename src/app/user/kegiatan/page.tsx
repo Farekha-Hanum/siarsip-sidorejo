@@ -87,45 +87,36 @@ export default function UserKegiatanPage() {
         
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3 text-[#80e5b0]">✦ Laporan Keaktifan Anggota</p>
-            <h1 className="font-bebas text-5xl md:text-6xl tracking-tight leading-none mb-4">Input Kegiatan</h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3 text-[#80e5b0]">✦ Modul Presensi & Poin Keaktifan</p>
+            <h1 className="font-extrabold text-3xl md:text-4xl tracking-tight leading-tight mb-4">Presensi Kegiatan</h1>
             <p className="text-white/60 text-sm max-w-sm mb-6 leading-relaxed">
-              Konfirmasi kehadiran Anda pada setiap kegiatan ranting untuk mengumpulkan poin. 
-              Poin ini digunakan sebagai syarat mendapatkan sertifikat **Anggota Terbest**.
+              Konfirmasi kehadiran Anda pada setiap kegiatan organisasi. Setiap kehadiran yang divalidasi admin akan menambah poin keaktifan anggota.
             </p>
             
             <div className="flex gap-3">
               <div className="px-4 py-2 bg-white/10 rounded-xl border border-white/10 flex items-center gap-2">
                 <Zap size={16} className="text-[#f4c430]" />
-                <span className="text-xs font-bold text-white">{totalSkor} Poin Terkumpul</span>
+                <span className="text-xs font-bold text-white">{totalSkor} Poin Keaktifan</span>
               </div>
               <div className="px-4 py-2 bg-white/10 rounded-xl border border-white/10 flex items-center gap-2">
                 <Target size={16} className="text-[#f4c430]" />
-                <span className="text-xs font-bold text-white">Target 70 Poin</span>
+                <span className="text-xs font-bold text-white">{activities.length} Total Kegiatan</span>
               </div>
             </div>
           </div>
 
-          {/* Mini Radial Gauge Diagram */}
+          {/* Ringkasan Poin Keaktifan */}
           <div className="flex flex-col items-center justify-center">
             <div className="relative w-40 h-40 flex items-center justify-center">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
-                <motion.circle 
-                  cx="50" cy="50" r="44" fill="none" stroke="#f4c430" strokeWidth="8" 
-                  strokeDasharray="276"
-                  initial={{ strokeDashoffset: 276 }}
-                  animate={{ strokeDashoffset: 276 - (276 * progress / 100) }}
-                  transition={{ duration: 1.5 }}
-                  strokeLinecap="round" 
-                />
-              </svg>
-              <div className="absolute text-center">
-                <p className="font-bebas text-4xl leading-none">{Math.round(progress)}%</p>
-                <p className="text-[8px] font-black opacity-60 uppercase tracking-widest mt-1">Goal</p>
+              <div className="w-full h-full rounded-full flex items-center justify-center"
+                style={{ background: "rgba(255,255,255,0.08)", border: "4px solid rgba(244,196,48,0.4)" }}>
+                <div className="text-center">
+                  <p className="font-extrabold text-4xl leading-none">{totalSkor}</p>
+                  <p className="text-[9px] font-black opacity-70 uppercase tracking-widest mt-1">Total Poin</p>
+                </div>
               </div>
             </div>
-            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-[#f4c430]">Progres Terbest</p>
+            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-[#f4c430]">Poin Keaktifan</p>
           </div>
         </div>
       </motion.div>
@@ -133,7 +124,7 @@ export default function UserKegiatanPage() {
       {/* ===== ACTIVITY LIST ===== */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
-          <h3 className="font-bebas text-2xl text-slate-400 tracking-widest">RIWAYAT KEGIATAN</h3>
+          <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wider">RIWAYAT KEGIATAN</h3>
           <span className="text-[10px] font-bold text-slate-400 uppercase">{activities.length} Total</span>
         </div>
 
@@ -219,8 +210,8 @@ export default function UserKegiatanPage() {
               <div className="px-8 py-6 flex justify-between items-center"
                 style={{ background: `linear-gradient(135deg, ${NU_DARK}, ${NU_GREEN})` }}>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#80e5b0]">Konfirmasi Kehadiran</p>
-                  <h2 className="font-bebas text-3xl text-white tracking-tight">Klaim Poin Kegiatan</h2>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#80e5b0]">Konfirmasi Presensi</p>
+                  <h2 className="font-bold text-2xl text-white tracking-tight">Konfirmasi Kehadiran</h2>
                 </div>
                 <button onClick={() => setSelectedKegiatan(null)}
                   className="p-2 rounded-xl bg-white/10 text-white/70 hover:text-white transition-all">
@@ -234,7 +225,7 @@ export default function UserKegiatanPage() {
                     <CheckCircle2 size={40} />
                   </div>
                   <div>
-                    <p className="font-bebas text-3xl text-slate-800">Berhasil Terkirim!</p>
+                    <p className="font-bold text-2xl text-slate-800">Berhasil Terkirim!</p>
                     <p className="text-sm text-slate-500 mt-1">Status kehadiran Anda akan segera diverifikasi oleh admin.</p>
                   </div>
                 </div>
@@ -244,7 +235,7 @@ export default function UserKegiatanPage() {
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Nama Kegiatan</p>
                     <h3 className="font-bold text-xl text-slate-700">{selectedKegiatan.nama_kegiatan}</h3>
                     <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black bg-[#fdf8e6] text-[#7a4f00] border border-[#f4c430]/10">
-                      <Award size={16} /> +{selectedKegiatan.bobot_skor} POIN TERBEST
+                      <Award size={16} /> +{selectedKegiatan.bobot_skor} POIN KEAKTIFAN
                     </div>
                   </div>
 

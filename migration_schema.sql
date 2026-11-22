@@ -119,24 +119,37 @@ ALTER TABLE public.kegiatan ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_kegiatan ENABLE ROW LEVEL SECURITY;
 
 -- Kebijakan Profil
+DROP POLICY IF EXISTS "Public profiles are viewable by authenticated users" ON public.profiles;
 CREATE POLICY "Public profiles are viewable by authenticated users" ON public.profiles FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id);
 
 -- Kebijakan Data Pengurus (Read All, Write Admin)
+DROP POLICY IF EXISTS "Viewable by authenticated users" ON public.data_pengurus;
 CREATE POLICY "Viewable by authenticated users" ON public.data_pengurus FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Manage by admins only" ON public.data_pengurus;
 CREATE POLICY "Manage by admins only" ON public.data_pengurus FOR ALL TO authenticated 
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
 -- Kebijakan Inventaris (Read All, Write Admin)
+DROP POLICY IF EXISTS "Viewable by authenticated users" ON public.inventaris;
 CREATE POLICY "Viewable by authenticated users" ON public.inventaris FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Manage by admins only" ON public.inventaris;
 CREATE POLICY "Manage by admins only" ON public.inventaris FOR ALL TO authenticated 
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
 
 -- Kebijakan Surat (Own or Admin)
+DROP POLICY IF EXISTS "Viewable by owner or admin" ON public.surat;
 CREATE POLICY "Viewable by owner or admin" ON public.surat FOR SELECT TO authenticated 
   USING (auth.uid() = id_user OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+
+DROP POLICY IF EXISTS "Manage by admins only" ON public.surat;
 CREATE POLICY "Manage by admins only" ON public.surat FOR ALL TO authenticated 
   USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+
 
 --------------------------------------------------------------------------------
 -- 9. TRIGGER OTOMATIS PROFIL (Sync Auth -> Profile)
@@ -166,3 +179,34 @@ CREATE TRIGGER on_auth_user_created
 INSERT INTO storage.buckets (id, name, public) VALUES ('archives', 'archives', false) ON CONFLICT (id) DO NOTHING;
 INSERT INTO storage.buckets (id, name, public) VALUES ('evidence', 'evidence', false) ON CONFLICT (id) DO NOTHING;
 INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true) ON CONFLICT (id) DO NOTHING;
+
+--------------------------------------------------------------------------------
+-- 11. GRANT AKSES API (Wajib sejak perubahan Supabase 30 Oktober 2026)
+-- Tanpa ini, tabel baru tidak bisa diakses via supabase-js / PostgREST / GraphQL
+--------------------------------------------------------------------------------
+
+-- Grant untuk role 'authenticated' (user yang sudah login)
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.data_pengurus TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.inventaris TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.surat TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.kegiatan TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_kegiatan TO authenticated;
+GRANT SELECT ON public.view_leaderboard TO authenticated;
+
+-- Grant untuk role 'anon' (akses publik tanpa login - hanya baca jika diperlukan)
+-- Dinonaktifkan karena semua tabel ini memerlukan autentikasi
+-- GRANT SELECT ON public.profiles TO anon;
+
+-- Grant untuk role 'service_role' (backend / admin penuh)
+GRANT ALL ON public.profiles TO service_role;
+GRANT ALL ON public.data_pengurus TO service_role;
+GRANT ALL ON public.inventaris TO service_role;
+GRANT ALL ON public.surat TO service_role;
+GRANT ALL ON public.kegiatan TO service_role;
+GRANT ALL ON public.user_kegiatan TO service_role;
+GRANT SELECT ON public.view_leaderboard TO service_role;
+
+-- Grant untuk sequence (agar INSERT dengan SERIAL bisa berjalan)
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO service_role;

@@ -66,3 +66,11 @@ USING (
   auth.uid() = id_user 
   OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
 );
+
+--------------------------------------------------------------------------------
+-- GRANT AKSES API untuk tabel baru (Wajib sejak perubahan Supabase 30 Oktober 2026)
+--------------------------------------------------------------------------------
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.settings TO authenticated;
+GRANT ALL ON public.settings TO service_role;
+GRANT USAGE, SELECT ON SEQUENCE public.settings_id_seq TO authenticated;
+GRANT USAGE, SELECT ON SEQUENCE public.settings_id_seq TO service_role;

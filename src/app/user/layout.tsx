@@ -21,6 +21,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import LogoutButton from "@/components/auth/LogoutButton";
+import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { icon: Home,          label: "Beranda",        href: "/user" },
@@ -31,15 +32,6 @@ const navItems = [
       { label: "Arsip IPNU", href: "/user/surat-digital/ipnu" },
       { label: "Arsip IPPNU", href: "/user/surat-digital/ippnu" },
       { label: "Arsip Gabungan", href: "/user/surat-digital/gabungan" }
-    ]
-  },
-  { 
-    icon: FileText,      
-    label: "Buat Surat",     
-    subItems: [
-      { label: "Surat IPNU", href: "/user/surat-digital/ipnu/buat?jenis=Surat%20Tugas&kode=ST" },
-      { label: "Surat IPPNU", href: "/user/surat-digital/ippnu/buat?jenis=Surat%20Mandat&kode=SM" },
-      { label: "Surat Gabungan", href: "/user/surat-digital/gabungan/buat?jenis=Proposal%20Kegiatan&kode=PRP" }
     ]
   },
   { icon: Scan,          label: "Scanner OCR",    href: "/user/scanner" },
@@ -56,6 +48,18 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }: any) => {
+      if (user) {
+        setUserName(user.user_metadata?.nama_lengkap || user.email?.split("@")[0] || "Anggota");
+      }
+    }).catch((err: any) => {
+      console.warn("UserLayout auth check warning:", err);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen font-sans pb-20 md:pb-10" style={{ background: "#f8faf9" }}>
@@ -77,8 +81,8 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 <Image src="/logo-baru.png" alt="Logo" width={32} height={32} className="object-cover mx-auto" />
               </div>
               <div className="hidden sm:block">
-                <p className="font-bebas text-xl text-white tracking-widest leading-none">SIMPEL NU</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#f4c430]">
+                <p className="font-extrabold text-lg text-white tracking-wider leading-none">SIMPEL NU</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f4c430]">
                   PORTAL USER
                 </p>
               </div>
@@ -99,7 +103,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
                       <button
-                        className={`px-3 py-2 rounded-2xl text-[10px] font-bold transition-all flex flex-col items-center gap-1.5 min-w-[80px] ${
+                        className={`px-3 py-2 rounded-2xl text-[10px] font-bold tracking-wide transition-all flex flex-col items-center gap-1.5 min-w-[80px] ${
                           isActive ? "bg-white text-[#1f9a5e] shadow-xl" : "text-white/80 hover:bg-white/10"
                         }`}
                       >
@@ -138,7 +142,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                   <Link key={item.label} href={item.href || "#"}>
                     <motion.div
                       whileHover={{ y: -2 }}
-                      className={`px-3 py-2 rounded-2xl text-[10px] font-bold transition-all flex flex-col items-center gap-1.5 min-w-[80px] ${
+                      className={`px-3 py-2 rounded-2xl text-[10px] font-bold tracking-wide transition-all flex flex-col items-center gap-1.5 min-w-[80px] ${
                         isActive ? "bg-white text-[#1f9a5e] shadow-xl" : "text-white/80 hover:bg-white/10"
                       }`}
                     >
@@ -154,11 +158,11 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-2">
               <div className="hidden xl:flex items-center gap-3 pr-4 border-r border-white/10 mr-2">
                 <div className="text-right">
-                  <p className="text-[10px] font-bold text-white/60 uppercase tracking-tighter leading-none">Anggota</p>
-                  <p className="text-xs font-bold text-white leading-none mt-1">Sidorejo</p>
+                  <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest leading-none">Anggota</p>
+                  <p className="text-xs font-bold text-white leading-none mt-1 max-w-[140px] truncate tracking-wide">{userName || "Sidorejo"}</p>
                 </div>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/20 text-white font-bold text-xs shadow-inner border border-white/10">
-                  U
+                  {userName ? userName.charAt(0).toUpperCase() : "U"}
                 </div>
               </div>
               <LogoutButton variant="navbar" />
@@ -188,7 +192,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
             <div className="p-6 flex items-center justify-between border-b bg-white">
               <div className="flex items-center gap-3">
                 <Image src="/logo-baru.png" alt="Logo" width={32} height={32} />
-                <span className="font-bebas text-xl text-[#1f9a5e]">MENU UTAMA</span>
+                <span className="font-bold text-base text-[#1f9a5e]">MENU UTAMA</span>
               </div>
               <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-xl bg-slate-100">
                 <X size={24} />

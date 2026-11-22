@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, PlusCircle, ArrowRight, Star } from "lucide-react";
+import { Archive, PlusCircle, ArrowRight, FolderKanban } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -10,28 +10,28 @@ const categories = [
     id: "ipnu",
     name: "IPNU",
     fullName: "Ikatan Pelajar Nahdlatul Ulama",
-    desc: "Buat surat tugas, undangan, dan keterangan untuk organisasi IPNU.",
+    desc: "Lihat dan telusuri arsip surat masuk dan surat keluar untuk organisasi IPNU.",
     logo: "/logo-ipnu.png",
     color: "#2d8c5a",
-    link: "/user/surat-digital/ipnu/buat"
+    link: "/user/surat-digital/ipnu"
   },
   {
     id: "ippnu",
     name: "IPPNU",
     fullName: "Ikatan Pelajar Putri Nahdlatul Ulama",
-    desc: "Buat surat mandat, undangan, dan permohonan untuk organisasi IPPNU.",
+    desc: "Lihat dan telusuri arsip surat masuk dan surat keluar untuk organisasi IPPNU.",
     logo: "/logo-ippnu.png",
     color: "#145c38",
-    link: "/user/surat-digital/ippnu/buat"
+    link: "/user/surat-digital/ippnu"
   },
   {
     id: "gabungan",
     name: "Gabungan",
     fullName: "IPNU - IPPNU",
-    desc: "Buat proposal kegiatan dan surat undangan bersama (Gabungan).",
+    desc: "Lihat dan telusuri arsip surat bersama dan proposal kegiatan gabungan IPNU & IPPNU.",
     logo: "/logo-baru.png",
     color: "#0d3320",
-    link: "/user/surat-digital/gabungan/buat"
+    link: "/user/surat-digital/gabungan"
   }
 ];
 
@@ -45,13 +45,13 @@ export default function UserSuratSelectorPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700 border border-green-100 shadow-sm"
         >
-          <Star size={14} fill="#f4c430" className="text-[#f4c430]" />
-          <span className="text-xs font-bold uppercase tracking-widest">Digital Letter Editor</span>
+          <Archive size={14} className="text-[#1f9a5e]" />
+          <span className="text-xs font-bold uppercase tracking-widest">Arsip Surat Digital</span>
         </motion.div>
-        <h1 className="text-5xl font-bebas text-[#0d3320] tracking-tight">Pilih Kategori Surat</h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-[#0d3320] tracking-tight">Pilih Kategori Arsip Surat</h1>
         <p className="text-slate-500 max-w-2xl mx-auto text-sm leading-relaxed">
-          Silakan pilih organisasi tujuan pembuatan surat digital. Sistem akan otomatis menyesuaikan KOP surat, 
-          penomoran, dan arsip sesuai dengan pilihan Anda.
+          Silakan pilih kategori organisasi untuk melihat dan menelusuri riwayat dokumen surat masuk (hasil scan fisik)
+          serta surat keluar resmi yang tersimpan dalam sistem.
         </p>
       </div>
 
@@ -68,7 +68,7 @@ export default function UserSuratSelectorPage() {
           >
             {/* Decoration */}
             <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-              <FileText size={100} />
+              <Archive size={100} />
             </div>
 
             {/* Logo Circle */}
@@ -78,7 +78,7 @@ export default function UserSuratSelectorPage() {
             </div>
 
             <div className="space-y-2 flex-1">
-              <h2 className="text-3xl font-bebas text-[#0d3320] tracking-wide">{cat.name}</h2>
+              <h2 className="text-2xl font-bold text-[#0d3320] tracking-tight">{cat.name}</h2>
               <p className="text-[10px] font-bold uppercase text-green-600 tracking-widest">{cat.fullName}</p>
               <p className="text-sm text-slate-500 leading-relaxed mt-4">
                 {cat.desc}
@@ -90,7 +90,7 @@ export default function UserSuratSelectorPage() {
                 className="w-full py-4 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer"
                 style={{ background: `linear-gradient(135deg, ${cat.color}, #1a7a4a)` }}
               >
-                Buat Surat <ArrowRight size={18} />
+                Buka Arsip Surat <ArrowRight size={18} />
               </button>
             </Link>
           </motion.div>
@@ -105,8 +105,8 @@ export default function UserSuratSelectorPage() {
                 <PlusCircle className="text-[#f4c430]" size={24} />
              </div>
              <div className="text-left">
-                <h4 className="font-bold text-lg">Butuh Surat Lain?</h4>
-                <p className="text-white/50 text-sm">Anda juga bisa menggunakan fitur Scanner OCR untuk surat masuk.</p>
+                <h4 className="font-bold text-lg">Punya Surat Masuk Fisik?</h4>
+                <p className="text-white/50 text-sm">Gunakan fitur Scanner OCR untuk memindai dokumen fisik ke dalam arsip digital.</p>
              </div>
           </div>
           <Link href="/user/scanner">

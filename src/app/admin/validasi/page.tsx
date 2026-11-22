@@ -27,27 +27,59 @@ export default function AdminValidationPage() {
       .from("view_leaderboard")
       .select("*")
       .order("total_skor", { ascending: false });
-    if (data) setLeaderboard(data);
+    if (data) {
+      const filtered = data.filter((item: any) => {
+        const name = (item.nama_lengkap || item.username || "").toLowerCase();
+        const role = (item.role || "").toLowerCase();
+        return role !== "admin" && !name.includes("admin");
+      });
+      setLeaderboard(filtered);
+    }
   }
 
   async function fetchSubmissions() {
     setLoading(true);
-    // Mengembalikan join tabel karena schema database sudah kita perbaiki
-    const { data, error } = await supabase
+    const { data: subsData, error: subsError } = await supabase
       .from("user_kegiatan")
       .select(`
         *,
-        profiles(nama_lengkap),
         kegiatan(nama_kegiatan, bobot_skor)
       `)
       .eq("status_validasi", "pending")
       .order("created_at", { ascending: true });
 
-    if (error) {
-      console.error("Fetch Error:", error.message);
+    if (subsError) {
+      console.error("Fetch Error:", subsError.message);
+      setSubmissions([]);
+      setLoading(false);
+      return;
     }
-    
-    setSubmissions(data || []);
+
+    if (!subsData || subsData.length === 0) {
+      setSubmissions([]);
+      setLoading(false);
+      return;
+    }
+
+    // Ambil data profil terpisah agar tidak error PGRST200 schema cache
+    const userIds = Array.from(new Set(subsData.map((s: any) => s.id_user).filter(Boolean)));
+    let profilesMap = new Map();
+    if (userIds.length > 0) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, nama_lengkap")
+        .in("id", userIds);
+      if (profs) {
+        profilesMap = new Map(profs.map((p: any) => [p.id, p]));
+      }
+    }
+
+    const merged = subsData.map((s: any) => ({
+      ...s,
+      profiles: profilesMap.get(s.id_user) || { nama_lengkap: "Anggota" }
+    }));
+
+    setSubmissions(merged);
     setLoading(false);
   }
 
@@ -71,9 +103,9 @@ export default function AdminValidationPage() {
         style={{ background: `linear-gradient(135deg, ${NU_DARK}, ${NU_GREEN})`, boxShadow: "0 8px 32px rgba(31,154,94,0.2)" }}
       >
         <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "#80e5b0" }}>✦ Panel Admin</p>
-        <h1 className="font-bebas text-4xl tracking-tight leading-none">Reward Anggota</h1>
+        <h1 className="font-extrabold text-2xl md:text-3xl tracking-tight leading-snug">Validasi Kegiatan</h1>
         <p className="text-white/55 mt-1.5 text-sm max-w-lg">
-          Berikan reward dan poin kepada anggota dengan memvalidasi bukti keikutsertaan kegiatan mereka.
+          Verifikasi bukti kehadiran anggota pada setiap kegiatan. Setelah disetujui, poin keaktifan anggota akan diperbarui secara otomatis.
         </p>
         {submissions.length > 0 && (
           <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold"
@@ -98,7 +130,7 @@ export default function AdminValidationPage() {
             style={{ background: "rgba(31,154,94,0.08)" }}>
             <Check size={36} style={{ color: NU_GREEN }} />
           </div>
-          <h3 className="font-bebas text-3xl" style={{ color: NU_DARK }}>Semua Sudah Divalidasi!</h3>
+          <h3 className="font-bold text-2xl" style={{ color: NU_DARK }}>Semua Sudah Divalidasi!</h3>
           <p className="mt-2 max-w-xs mx-auto text-sm" style={{ color: "#64748b" }}>
             Tidak ada bukti kegiatan yang menunggu validasi saat ini.
           </p>
@@ -178,7 +210,7 @@ export default function AdminValidationPage() {
       <div className="mt-12 space-y-4">
         <div className="flex items-center gap-2">
           <Trophy size={22} style={{ color: NU_GOLD }} />
-          <h2 className="font-bebas text-3xl" style={{ color: NU_DARK }}>Papan Peringkat Anggota</h2>
+          <h2 className="font-bold text-xl" style={{ color: NU_DARK }}>Rekap Poin Keaktifan Anggota</h2>
         </div>
         <div className="bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100">
           <table className="w-full text-left">
@@ -206,16 +238,16 @@ export default function AdminValidationPage() {
                   <td className="px-6 py-4 font-bold text-sm text-slate-700">{u.nama_lengkap}</td>
                   <td className="px-6 py-4 text-sm text-slate-500">{u.username}</td>
                   <td className="px-6 py-4 text-right">
-                    <span className="font-bebas text-xl" style={{ color: NU_GREEN }}>{u.total_skor || 0}</span>
+                    <span className="font-bold text-base" style={{ color: NU_GREEN }}>{u.total_skor || 0}</span>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    {u.total_skor >= 70 ? (
+                    {u.total_skor > 0 ? (
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter"
                         style={{ background: "rgba(31,154,94,0.1)", color: NU_GREEN }}>
-                        <Medal size={12} /> Anggota Terbest
+                        <Medal size={12} /> Aktif
                       </span>
                     ) : (
-                      <span className="text-[10px] font-bold text-slate-300 uppercase tracking-tighter">Belum Mencapai Target</span>
+                      <span className="text-[10px] font-bold text-slate-300 uppercase tracking-tighter">Belum Ada Kegiatan</span>
                     )}
                   </td>
                 </tr>

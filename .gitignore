@@ -39,3 +39,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch and test scripts
+scratch/
+*.traineddata
+*.bak
+*.zip
+
+# Skripsi drafts and raw documents
+skripsi_baruuu/
+*.docx
+*.xlsx
+Buku Pedoman*
+Proposal_Skripsi*
+Matriks_Rencana*
+LOGO *.png
+logo_itsnu*.png
+logo_uin_placeholder.png
+
+

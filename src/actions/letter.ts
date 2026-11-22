@@ -57,7 +57,7 @@ export async function getLettersByOrg(org: string, category?: string) {
 
   let query = supabase
     .from("surat")
-    .select("*, profiles(nama_lengkap)")
+    .select("*")
     .eq("kategori_dashboard", org)
     .order("created_at", { ascending: false });
 

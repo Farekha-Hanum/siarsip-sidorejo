@@ -221,6 +221,8 @@ export async function uploadScannedSurat(formData: FormData) {
   }
 
   const kategoriDashboard = (formData.get("kategori_dashboard") as string) || "gabungan";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const publicFileUrl = `${supabaseUrl}/storage/v1/object/public/archives/${uploadData.path}`;
 
   // 2. Simpan ke Database
   const { error: dbError } = await supabase
@@ -232,6 +234,7 @@ export async function uploadScannedSurat(formData: FormData) {
       perihal: `[${jenisSurat || 'Surat'}] ${perihal || 'Tanpa Perihal'}`,
       tanggal_surat: parseIndonesianDate(tanggal) || new Date().toISOString().split('T')[0],
       storage_path: uploadData.path,
+      file_url: publicFileUrl,
       kategori_dashboard: kategoriDashboard,
       metadata: {
         original_date: tanggal,

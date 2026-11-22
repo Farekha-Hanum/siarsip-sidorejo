@@ -11,7 +11,7 @@ Aplikasi manajemen arsip surat digital untuk Pimpinan Ranting IPNU dan IPPNU Des
 - **Scan OCR** — Pemindaian surat masuk dengan pembacaan teks otomatis.
 - **Manajemen Pengurus** — Data kepengurusan organisasi IPNU dan IPPNU.
 - **Inventaris** — Pencatatan aset dan perlengkapan organisasi.
-- **Daftar Kegiatan & Reward Anggota** — Pencatatan partisipasi kegiatan, validasi, _leaderboard_ skor, dan unduhan sertifikat.
+- **Daftar Kegiatan & Validasi Kegiatan** — Pencatatan partisipasi kegiatan, validasi kehadiran, _leaderboard_ skor, dan unduhan sertifikat.
 
 ## Tech Stack
 

@@ -17,83 +17,172 @@ import {
   ClipboardList,
   Users,
   Scan,
-  Download
+  Download,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { generateMemberCertificate } from "@/lib/certificate-generator";
+import { generateMemberCertificate, detectIsFemale } from "@/lib/certificate-generator";
 
-const NU_GREEN  = "#4dcf8f";
-const NU_DARK   = "#1f9a5e";
-const NU_GOLD   = "#f4c430";
+const NU_GREEN = "#4dcf8f";
+const NU_DARK = "#1f9a5e";
+const NU_GOLD = "#f4c430";
 
 export default function UserDashboard() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isTopUser, setIsTopUser] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [downloadingCert, setDownloadingCert] = useState(false);
   const supabase = createClient();
 
   useEffect(() => { fetchDashboardData(); }, []);
 
   async function fetchDashboardData() {
-    setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    // Fetch profile to get assigned_dashboard
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("assigned_dashboard")
-      .eq("id", user.id)
-      .single();
+      // Fetch profile to get assigned_dashboard, nama_lengkap, dan organisasi
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("assigned_dashboard, nama_lengkap, organisasi")
+        .eq("id", user.id)
+        .single();
 
-    const assignedDashboard = profileData?.assigned_dashboard || "all";
+      const assignedDashboard = profileData?.assigned_dashboard || "all";
+      const resolvedName = profileData?.nama_lengkap || user.user_metadata?.nama_lengkap || "Anggota";
+      const resolvedOrg = profileData?.organisasi || user.user_metadata?.organisasi;
 
-    const { data: leaderData } = await supabase
-      .from("view_leaderboard").select("*")
-      .order("total_skor", { ascending: false });
+      const { data: leaderData } = await supabase
+        .from("view_leaderboard").select("*")
+        .order("total_skor", { ascending: false });
 
-    if (leaderData) {
-      setLeaderboard(leaderData);
-      const myRankIndex = leaderData.findIndex(l => l.id === user.id);
-      if (myRankIndex !== -1) {
-        const myData = leaderData[myRankIndex];
-        setUserProfile({ ...myData, rank: myRankIndex + 1, assigned_dashboard: assignedDashboard });
-        if (myRankIndex === 0 && (myData?.total_skor || 0) >= 70) setIsTopUser(true);
+      if (leaderData && leaderData.length > 0) {
+        // Filter akun admin agar tidak muncul di papan peringkat user
+        const memberLeaderboard = leaderData.filter((l: any) => {
+          const name = (l.nama_lengkap || l.username || "").toLowerCase();
+          const role = (l.role || "").toLowerCase();
+          return role !== "admin" && !name.includes("admin");
+        });
+
+        setLeaderboard(memberLeaderboard);
+        const myRankIndex = memberLeaderboard.findIndex((l: any) => l.id === user.id);
+        if (myRankIndex !== -1) {
+          const myData = memberLeaderboard[myRankIndex];
+          setUserProfile({
+            ...myData,
+            nama_lengkap: myData.nama_lengkap || resolvedName,
+            organisasi: myData.organisasi || resolvedOrg,
+            rank: myRankIndex + 1,
+            assigned_dashboard: assignedDashboard
+          });
+          if (myRankIndex === 0 && (myData?.total_skor || 0) >= 70) setIsTopUser(true);
+        } else {
+          // Handle user not in leaderboard yet (or admin viewing user page)
+          setUserProfile({
+            id: user.id,
+            nama_lengkap: resolvedName,
+            organisasi: resolvedOrg,
+            total_skor: 0,
+            rank: "-",
+            assigned_dashboard: assignedDashboard
+          });
+        }
       } else {
-        // Handle user not in leaderboard yet
-        setUserProfile({ id: user.id, nama_lengkap: user.user_metadata?.nama_lengkap || "Anggota", total_skor: 0, rank: "-", assigned_dashboard: assignedDashboard });
+        setUserProfile({
+          id: user.id,
+          nama_lengkap: resolvedName,
+          organisasi: resolvedOrg,
+          total_skor: 0,
+          rank: "-",
+          assigned_dashboard: assignedDashboard
+        });
       }
+    } catch (err) {
+      console.warn("fetchDashboardData error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function handleDownloadCertificate() {
     if (!userProfile) return;
-    const pdfBytes = await generateMemberCertificate({
-      nama: userProfile.nama_lengkap,
-      skor: userProfile.total_skor || 0,
-      tanggal: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
-    });
-    const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Sertifikat_${userProfile.nama_lengkap.replace(/\s+/g, "_")}.pdf`;
-    link.click();
+    try {
+      setDownloadingCert(true);
+      const isFemale = detectIsFemale({
+        nama_lengkap: userProfile.nama_lengkap,
+        organisasi: userProfile.organisasi,
+        assigned_dashboard: userProfile.assigned_dashboard,
+      });
+
+      const orgType = isFemale ? "ippnu" : "ipnu";
+      let ketuaNama = isFemale ? "Feni Lidyana" : "Ahmad Hanafi";
+      let sekretarisNama = isFemale ? "Siti Yulia Farekha Hanum" : "M. Rizqi Pratama";
+      let ketuaNia = isFemale ? "11.26.7455.001" : "11.26.7354.001";
+      let sekretarisNia = isFemale ? "11.26.7455.002" : "11.26.7354.002";
+
+      // Coba ambil dari data_pengurus jika admin sudah menginput pengurus
+      try {
+        const { data: pengurusList } = await supabase
+          .from("data_pengurus")
+          .select("*")
+          .ilike("organisasi", orgType);
+
+        if (pengurusList && pengurusList.length > 0) {
+          const ketua = pengurusList.find((p: any) => p.jabatan?.toLowerCase().includes("ketua"));
+          const sekretaris = pengurusList.find((p: any) => p.jabatan?.toLowerCase().includes("sekretaris"));
+          if (ketua?.nama_lengkap) {
+            ketuaNama = ketua.nama_lengkap;
+            if (ketua.nia) ketuaNia = ketua.nia;
+          }
+          if (sekretaris?.nama_lengkap) {
+            sekretarisNama = sekretaris.nama_lengkap;
+            if (sekretaris.nia) sekretarisNia = sekretaris.nia;
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch data_pengurus for certificate:", err);
+      }
+
+      const pdfBytes = await generateMemberCertificate({
+        nama: userProfile.nama_lengkap,
+        skor: userProfile.total_skor || 0,
+        tanggal: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+        gender: isFemale ? "perempuan" : "laki-laki",
+        organisasi: isFemale ? "IPPNU" : "IPNU",
+        ketuaNama,
+        ketuaNia,
+        sekretarisNama,
+        sekretarisNia,
+      });
+
+      const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Sertifikat_Anggota_Tergiat_${orgType.toUpperCase()}_${userProfile.nama_lengkap.replace(/\s+/g, "_")}.pdf`;
+      link.click();
+    } catch (error) {
+      console.error("Gagal generate sertifikat:", error);
+      alert("Terjadi kendala saat memproses sertifikat digital.");
+    } finally {
+      setDownloadingCert(false);
+    }
   }
 
   const progress = userProfile ? Math.min((userProfile.total_skor / 70) * 100, 100) : 0;
   const skor = userProfile?.total_skor || 0;
 
+  const isFemaleMember = detectIsFemale({
+    nama_lengkap: userProfile?.nama_lengkap,
+    organisasi: userProfile?.organisasi,
+    assigned_dashboard: userProfile?.assigned_dashboard,
+  });
+
   const dashboardType = userProfile?.assigned_dashboard || "all";
   const arsipHref = dashboardType === "all" ? "/user/surat-digital" : `/user/surat-digital/${dashboardType}`;
-  const buatHref =
-    dashboardType === "all" ? "/user/surat-digital" :
-    dashboardType === "ippnu" ? "/user/surat-digital/ippnu/buat?jenis=Surat%20Mandat&kode=SM" :
-    dashboardType === "gabungan" ? "/user/surat-digital/gabungan/buat?jenis=Proposal%20Kegiatan&kode=PRP" :
-    "/user/surat-digital/ipnu/buat?jenis=Surat%20Tugas&kode=ST";
 
   if (loading) {
     return (
@@ -112,7 +201,7 @@ export default function UserDashboard() {
             <div className="w-2 h-2 rounded-full bg-[#f4c430] animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Selamat Datang</span>
           </div>
-          <h1 className="font-bebas text-5xl md:text-6xl tracking-tight leading-none text-[#1f9a5e]">
+          <h1 className="font-extrabold text-3xl md:text-4xl tracking-tight leading-tight text-[#1f9a5e]">
             Halo, <span className="text-[#f4c430]">{userProfile?.nama_lengkap?.split(' ')[0] || "Anggota"}</span>!
           </h1>
           <p className="text-slate-500 text-sm max-w-md mt-2 leading-relaxed">
@@ -122,13 +211,13 @@ export default function UserDashboard() {
 
         <div className="flex gap-4">
           <div className="px-6 py-3 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
-             <div className="w-8 h-8 rounded-lg bg-[#fdf8e6] flex items-center justify-center text-[#f4c430]">
-                <Zap size={18} fill="#f4c430" />
-             </div>
-             <div>
-                <p className="text-[9px] font-black text-slate-400 uppercase">Skor Anda</p>
-                <p className="font-bebas text-xl text-[#1f9a5e] leading-none">{skor} Poin</p>
-             </div>
+            <div className="w-8 h-8 rounded-lg bg-[#fdf8e6] flex items-center justify-center text-[#f4c430]">
+              <Zap size={18} fill="#f4c430" />
+            </div>
+            <div>
+              <p className="text-[9px] font-black text-slate-400 uppercase">Skor Anda</p>
+              <p className="font-bold text-lg text-[#1f9a5e] leading-none">{skor} Poin</p>
+            </div>
           </div>
         </div>
       </div>
@@ -143,53 +232,74 @@ export default function UserDashboard() {
         <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none text-white">
           <Medal size={240} />
         </div>
-        
+
         <div className="relative z-10 flex flex-col lg:flex-row items-center gap-10">
           {/* Radial Progress Gauge */}
           <div className="relative w-48 h-48 flex items-center justify-center shrink-0">
-             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
-                <motion.circle 
-                  cx="50" cy="50" r="45" fill="none" stroke="#f4c430" strokeWidth="8" 
-                  strokeDasharray="283"
-                  initial={{ strokeDashoffset: 283 }}
-                  animate={{ strokeDashoffset: 283 - (283 * progress / 100) }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                  strokeLinecap="round" 
-                />
-             </svg>
-             <div className="absolute text-center">
-                <div className="font-bebas text-5xl tracking-tighter leading-none">{skor}</div>
-                <div className="text-[10px] font-black opacity-60 uppercase tracking-widest">Poin</div>
-             </div>
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
+              <motion.circle
+                cx="50" cy="50" r="45" fill="none" stroke="#f4c430" strokeWidth="8"
+                strokeDasharray="283"
+                initial={{ strokeDashoffset: 283 }}
+                animate={{ strokeDashoffset: 283 - (283 * progress / 100) }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className="absolute text-center">
+              <div className="font-black text-4xl tracking-tight leading-none">{skor}</div>
+              <div className="text-[10px] font-black opacity-60 uppercase tracking-widest">Poin</div>
+            </div>
           </div>
 
           <div className="flex-1 text-center lg:text-left space-y-4">
             <div>
-              <p className="text-[#80e5b0] text-xs font-black uppercase tracking-[0.3em] mb-2">✦ Status Anggota Terbest</p>
-              <h2 className="font-bebas text-4xl md:text-5xl leading-none tracking-tight">
-                {skor >= 70 ? "Selamat! Anda Anggota Terbest" : "Terus Aktif, Kejar Target!"}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 mb-2.5">
+                <span className="text-[#80e5b0] text-xs font-black uppercase tracking-[0.3em]">✦ Status Anggota Tergiat</span>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-white shadow-sm">
+                  <Image
+                    src={isFemaleMember ? "/logo-ippnu.png" : "/logo-ipnu.png"}
+                    alt={isFemaleMember ? "IPPNU" : "IPNU"}
+                    width={16}
+                    height={16}
+                    className="object-contain"
+                  />
+                  {isFemaleMember ? "Piagam IPPNU (Rekanita)" : "Piagam IPNU (Rekan)"}
+                </span>
+              </div>
+              <h2 className="font-extrabold text-2xl md:text-3xl leading-snug tracking-tight">
+                {skor >= 70 ? "Selamat! Anda Anggota Tergiat" : "Terus Aktif, Kejar Target!"}
               </h2>
               <p className="text-white/60 text-sm max-w-lg mt-3 leading-relaxed">
-                {skor >= 70 
-                  ? "Anda telah mencapai ambang batas 70 poin. Sertifikat penghargaan digital Anda sudah siap untuk diunduh." 
-                  : `Anda membutuhkan ${70 - skor} poin lagi untuk mendapatkan predikat Anggota Terbest. Ikuti lebih banyak kegiatan!`}
+                {skor >= 70
+                  ? `Anda telah mencapai ambang batas 70 poin. Piagam sertifikat penghargaan resmi ${isFemaleMember ? "IPPNU" : "IPNU"} Sidorejo bertanda tangan Ketua & Sekretaris sudah siap diunduh.`
+                  : `Anda membutuhkan ${70 - skor} poin lagi untuk mendapatkan predikat Anggota Tergiat. Ikuti lebih banyak kegiatan!`}
               </p>
             </div>
 
             <div className="pt-4 flex flex-wrap justify-center lg:justify-start gap-4">
               <button
-                onClick={skor >= 70 ? handleDownloadCertificate : undefined}
-                className={`px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3 transition-all ${
-                  skor >= 70 
-                    ? "bg-[#f4c430] hover:bg-[#eab308] text-[#0d3320] shadow-xl shadow-[#f4c430]/20 hover:scale-105" 
+                onClick={skor >= 70 && !downloadingCert ? handleDownloadCertificate : undefined}
+                disabled={skor < 70 || downloadingCert}
+                className={`px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3 transition-all ${skor >= 70
+                    ? "bg-[#f4c430] hover:bg-[#eab308] text-[#0d3320] shadow-xl shadow-[#f4c430]/20 hover:scale-105 active:scale-95 cursor-pointer"
                     : "bg-white/5 text-white/30 border border-white/10 cursor-not-allowed"
-                }`}
+                  }`}
               >
-                <Download size={18} /> 
-                {skor >= 70 ? "Unduh Sertifikat" : "Sertifikat Terkunci"}
+                {downloadingCert ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-[#0d3320]/30 border-t-[#0d3320] rounded-full animate-spin" />
+                    Menyiapkan Piagam...
+                  </>
+                ) : (
+                  <>
+                    <Award size={18} />
+                    {skor >= 70 ? `Unduh Piagam (${isFemaleMember ? "IPPNU" : "IPNU"})` : "Sertifikat Terkunci"}
+                  </>
+                )}
               </button>
-              
+
               <Link href="/user/kegiatan">
                 <button className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3 transition-all border border-white/10">
                   <TrendingUp size={18} /> Lihat Daftar Kegiatan
@@ -203,44 +313,44 @@ export default function UserDashboard() {
       {/* ===== QUICK ACTIONS GRID ===== */}
       <div className="space-y-6">
         <div className="flex items-center gap-3 px-2">
-           <div className="h-px flex-1 bg-slate-200" />
-           <h3 className="font-bebas text-2xl text-slate-400 tracking-widest">MENU UTAMA</h3>
-           <div className="h-px flex-1 bg-slate-200" />
+          <div className="h-px flex-1 bg-slate-200" />
+          <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wider">MENU UTAMA</h3>
+          <div className="h-px flex-1 bg-slate-200" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { 
-              label: "Arsip Surat", 
-              desc: "Lihat & kelola arsip digital", 
-              icon: Archive, 
-              href: arsipHref, 
-              color: "#1f9a5e", 
-              gradient: "linear-gradient(135deg, #1f9a5e, #145c38)" 
+            {
+              label: "Arsip Surat",
+              desc: "Lihat & kelola arsip digital",
+              icon: Archive,
+              href: arsipHref,
+              color: "#1f9a5e",
+              gradient: "linear-gradient(135deg, #1f9a5e, #145c38)"
             },
-            { 
-              label: "Buat Surat", 
-              desc: "Generator surat otomatis", 
-              icon: FileText, 
-              href: buatHref, 
-              color: "#3b82f6", 
-              gradient: "linear-gradient(135deg, #3b82f6, #1d4ed8)" 
+            {
+              label: "Inventaris",
+              desc: "Aset & data inventaris",
+              icon: ClipboardList,
+              href: "/user/inventaris",
+              color: "#3b82f6",
+              gradient: "linear-gradient(135deg, #3b82f6, #1d4ed8)"
             },
-            { 
-              label: "Scanner OCR", 
-              desc: "Scan surat ke digital", 
-              icon: Scan, 
-              href: "/user/scanner", 
-              color: "#f59e0b", 
-              gradient: "linear-gradient(135deg, #f59e0b, #b45309)" 
+            {
+              label: "Scanner OCR",
+              desc: "Scan surat ke digital",
+              icon: Scan,
+              href: "/user/scanner",
+              color: "#f59e0b",
+              gradient: "linear-gradient(135deg, #f59e0b, #b45309)"
             },
-            { 
-              label: "Input Kegiatan", 
-              desc: "Absensi & klaim skor", 
-              icon: Target, 
-              href: "/user/kegiatan", 
-              color: "#ec4899", 
-              gradient: "linear-gradient(135deg, #ec4899, #be185d)" 
+            {
+              label: "Input Kegiatan",
+              desc: "Absensi & klaim skor",
+              icon: Target,
+              href: "/user/kegiatan",
+              color: "#ec4899",
+              gradient: "linear-gradient(135deg, #ec4899, #be185d)"
             },
           ].map((mod, i) => (
             <Link key={i} href={mod.href} className="flex group">
@@ -259,10 +369,10 @@ export default function UserDashboard() {
                   <mod.icon size={32} />
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-bebas text-3xl tracking-tight text-slate-800">{mod.label}</h4>
+                  <h4 className="font-bold text-xl tracking-tight text-slate-800">{mod.label}</h4>
                   <p className="text-xs text-slate-400 leading-relaxed font-medium">{mod.desc}</p>
                 </div>
-                <div className="mt-2 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all group-hover:gap-4" 
+                <div className="mt-2 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all group-hover:gap-4"
                   style={{ color: mod.color }}>
                   Buka Menu <ChevronRight size={14} />
                 </div>
@@ -285,7 +395,7 @@ export default function UserDashboard() {
               <div className="w-12 h-12 rounded-2xl bg-[#fef3c7] flex items-center justify-center">
                 <Trophy size={24} className="text-[#f59e0b]" />
               </div>
-              <h3 className="font-bebas text-3xl text-[#1f9a5e] tracking-tight">Peringkat Anggota Terbest</h3>
+              <h3 className="font-bold text-xl text-[#1f9a5e] tracking-tight">Peringkat Anggota Tergiat</h3>
             </div>
           </div>
 
@@ -306,11 +416,10 @@ export default function UserDashboard() {
                     return (
                       <tr key={item.id} className={`transition-colors ${isMe ? 'bg-[#f0faf4]/50' : 'hover:bg-slate-50/50'}`}>
                         <td className="px-10 py-6">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bebas text-xl shadow-sm ${
-                            index === 0 ? 'bg-[#f4c430] text-white' : 
-                            index === 1 ? 'bg-slate-300 text-white' :
-                            index === 2 ? 'bg-[#cd7f32] text-white' : 'text-slate-400'
-                          }`}>
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base shadow-sm ${index === 0 ? 'bg-[#f4c430] text-white' :
+                              index === 1 ? 'bg-slate-300 text-white' :
+                                index === 2 ? 'bg-[#cd7f32] text-white' : 'text-slate-400'
+                            }`}>
                             {index + 1}
                           </div>
                         </td>
@@ -321,7 +430,7 @@ export default function UserDashboard() {
                           </div>
                         </td>
                         <td className="px-10 py-6 text-right">
-                          <span className="font-bebas text-3xl text-[#1f9a5e]">{item.total_skor || 0}</span>
+                          <span className="font-bold text-xl text-[#1f9a5e]">{item.total_skor || 0}</span>
                           <span className="text-[10px] font-black text-slate-300 ml-1">PTS</span>
                         </td>
                       </tr>
@@ -368,7 +477,7 @@ export default function UserDashboard() {
                       const barHeight = Math.max((item.total_skor / (leaderboard[0]?.total_skor || 1)) * 60, 10);
                       const y = 80 - barHeight;
                       return (
-                        <motion.circle 
+                        <motion.circle
                           key={idx} cx={x} cy={y} r="1.5" fill="#ef4444" stroke="white" strokeWidth="0.5"
                           initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1 + (idx * 0.2) }}
                         />
@@ -402,22 +511,22 @@ export default function UserDashboard() {
                         >
                           {/* Front Face */}
                           <div className="absolute inset-x-0 bottom-0 w-full h-full shadow-lg"
-                               style={{ background: c.main, transform: "translateZ(5px)" }} />
+                            style={{ background: c.main, transform: "translateZ(5px)" }} />
                           {/* Side Face */}
                           <div className="absolute bottom-0 h-full w-[10px] right-[-10px] origin-left"
-                               style={{ background: c.side, transform: "rotateY(90deg)" }} />
+                            style={{ background: c.side, transform: "rotateY(90deg)" }} />
                           {/* Top Face */}
                           <div className="absolute top-[-10px] inset-x-0 h-[10px] origin-bottom"
-                               style={{ background: c.top, transform: "rotateX(90deg)" }} />
+                            style={{ background: c.top, transform: "rotateX(90deg)" }} />
                         </motion.div>
 
                         {/* Labels below chart */}
                         <div className="absolute top-[calc(100%+15px)] text-center w-32">
-                          <p className="font-bebas text-lg leading-none" style={{ color: c.main }}>
+                          <p className="font-bold text-sm leading-none" style={{ color: c.main }}>
                             {Math.round((item.total_skor / 70) * 100)}%
                           </p>
                           <p className="text-[7px] font-black uppercase text-slate-400 mt-1 leading-tight tracking-tighter">
-                            {item.nama_lengkap.split(' ')[0]}<br/>
+                            {item.nama_lengkap.split(' ')[0]}<br />
                             {idx === 0 ? "🥇 TERBAIK" : idx === 1 ? "🥈 RUNNER UP" : "TOP MEMBER"}
                           </p>
                         </div>
@@ -427,17 +536,17 @@ export default function UserDashboard() {
                 </div>
 
                 <div className="mt-24 p-6 rounded-[2rem] bg-slate-50 border border-slate-100 flex items-center justify-between">
-                   <div className="text-left">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Rata-rata Skor</p>
-                      <p className="font-bebas text-2xl text-slate-700">
-                        {Math.round(leaderboard.reduce((a, b) => a + (b.total_skor || 0), 0) / (leaderboard.length || 1))}
-                      </p>
-                   </div>
-                   <div className="w-px h-10 bg-slate-200" />
-                   <div className="text-right">
-                      <p className="text-[9px] font-black text-[#1f9a5e] uppercase tracking-widest">Target Capaian</p>
-                      <p className="font-bebas text-2xl text-[#1f9a5e]">70 PTS</p>
-                   </div>
+                  <div className="text-left">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Rata-rata Skor</p>
+                    <p className="font-bold text-xl text-slate-700">
+                      {Math.round(leaderboard.reduce((a, b) => a + (b.total_skor || 0), 0) / (leaderboard.length || 1))}
+                    </p>
+                  </div>
+                  <div className="w-px h-10 bg-slate-200" />
+                  <div className="text-right">
+                    <p className="text-[9px] font-black text-[#1f9a5e] uppercase tracking-widest">Target Capaian</p>
+                    <p className="font-bold text-xl text-[#1f9a5e]">70 PTS</p>
+                  </div>
                 </div>
               </div>
             </div>

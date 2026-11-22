@@ -19,9 +19,11 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error);
         setLoading(false);
+      } else if (result?.redirectUrl) {
+        window.location.href = result.redirectUrl;
       }
-    } catch (err) {
-      setError("Terjadi kesalahan tak terduga. Silakan coba lagi.");
+    } catch (err: any) {
+      setError(err?.message || "Terjadi kesalahan tak terduga. Silakan coba lagi.");
       setLoading(false);
     }
   };
@@ -67,8 +69,8 @@ export default function LoginPage() {
             <Image src="/logo-baru.png" alt="Logo" width={40} height={40} className="object-cover" />
           </div>
           <div>
-            <span className="font-bebas text-2xl text-white tracking-widest">SIMPEL NU</span>
-            <p className="text-[#80e5b0] text-[10px] tracking-widest uppercase -mt-1">Sidorejo</p>
+            <span className="font-extrabold text-xl text-white tracking-wider">SIMPEL NU</span>
+            <p className="text-[#80e5b0] text-[10px] tracking-widest uppercase -mt-0.5">Sidorejo</p>
           </div>
         </div>
 
@@ -92,7 +94,7 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="font-bebas text-5xl text-white leading-tight tracking-tight mb-4"
+            className="font-extrabold text-3xl md:text-4xl text-white leading-tight tracking-tight mb-4"
           >
             Selamat Datang<br />
             <span style={{ color: "#f4c430" }}>Pelajar NU</span> 👋
@@ -123,7 +125,7 @@ export default function LoginPage() {
           </motion.div>
         </div>
 
-        <p className="text-white/20 text-xs">© 2025 PRNU Sidorejo · SIMPEL NU</p>
+        <p className="text-white/20 text-xs">© 2026 - PR IPNU IPPNU Sidorejo - SIMPEL NU</p>
       </div>
 
       {/* Right Panel – Login Form */}
@@ -145,16 +147,16 @@ export default function LoginPage() {
             {/* Mobile logo */}
             <div className="flex items-center gap-3 mb-8 lg:hidden">
               <Image src="/logo-baru.png" alt="Logo" width={36} height={36} className="rounded-full object-cover" />
-              <span className="font-bebas text-xl text-white tracking-widest">SIMPEL NU</span>
+              <span className="font-extrabold text-lg text-white tracking-wider">SIMPEL NU</span>
             </div>
 
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-2">
                 <Star size={14} className="text-[#f4c430]" fill="#f4c430" />
-                <span className="text-[#80e5b0] text-xs font-bold tracking-widest uppercase">Login Anggota</span>
+                <span className="text-[#80e5b0] text-xs font-bold tracking-widest uppercase">Login Sistem</span>
               </div>
-              <h1 className="font-bebas text-4xl text-white tracking-tight">Masuk Sekarang</h1>
-              <p className="text-white/40 text-sm mt-1">Gunakan akun yang telah didaftarkan admin</p>
+              <h1 className="font-extrabold text-2xl md:text-3xl text-white tracking-tight">Masuk Sekarang</h1>
+              <p className="text-white/40 text-sm mt-1">Masukkan email dan password untuk melanjutkan</p>
             </div>
 
             {error && (
@@ -170,18 +172,18 @@ export default function LoginPage() {
             )}
 
             <form action={handleFormAction} className="space-y-5">
-              {/* Email */}
+              {/* Email atau Username */}
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-white/70 block">Email</label>
+                <label className="text-sm font-semibold text-white/70 block">Email atau Username</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-[#4dcf8f]/60 group-focus-within:text-[#f4c430] transition-colors">
                     <Mail size={18} />
                   </div>
                   <input
                     name="email"
-                    type="email"
+                    type="text"
                     required
-                    placeholder="email@example.com"
+                    placeholder="email@example.com atau username"
                     className="block w-full pl-11 pr-4 py-3.5 rounded-xl outline-none transition-all text-white placeholder-white/30 font-medium"
                     style={{
                       background: "rgba(255,255,255,0.06)",

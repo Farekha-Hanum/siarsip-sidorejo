@@ -94,7 +94,7 @@ export default function UserScannerPage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#1f9a5e]">Fitur Digitalisasi</span>
           </div>
-          <h1 className="text-5xl font-bebas text-slate-800 tracking-tight">Scanner Surat Otomatis</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">Scanner Surat Otomatis</h1>
           <p className="text-slate-500 mt-2 max-w-xl text-sm">
             Gunakan kamera HP Anda untuk memindai surat fisik. Sistem akan otomatis mengisi data surat ke arsip digital.
           </p>
@@ -125,7 +125,7 @@ export default function UserScannerPage() {
             <div className="w-24 h-24 bg-[#f0faf4] text-[#1f9a5e] rounded-[2rem] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-xl">
               <Camera size={44} />
             </div>
-            <h2 className="text-3xl font-bebas text-slate-800">Mulai Memindai Surat</h2>
+            <h2 className="text-2xl font-bold text-slate-800">Mulai Memindai Surat</h2>
             <p className="text-slate-400 mt-2 text-center max-w-sm text-sm font-medium">
               Klik untuk mengambil foto surat masuk. Pastikan posisi kamera tegak lurus dan pencahayaan terang.
             </p>
@@ -139,7 +139,7 @@ export default function UserScannerPage() {
                     <Loader2 size={24} className="text-[#1f9a5e] animate-pulse" />
                   </div>
                 </div>
-                <p className="font-bebas text-2xl text-slate-800">{status}</p>
+                <p className="font-bold text-lg text-slate-800">{status}</p>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Kecerdasan Buatan Sedang Bekerja...</p>
               </div>
             )}
@@ -170,7 +170,7 @@ export default function UserScannerPage() {
             <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
               <div className="flex items-center justify-between border-b border-slate-50 pb-6">
                 <div>
-                  <h3 className="text-2xl font-bebas text-slate-800 tracking-tight">Verifikasi Hasil Scan</h3>
+                  <h3 className="text-xl font-bold text-slate-800 tracking-tight">Verifikasi Hasil Scan</h3>
                   <p className="text-xs text-slate-400 mt-0.5">Pastikan data di bawah ini sudah sesuai dengan isi surat.</p>
                 </div>
                 <span className="bg-[#f0faf4] text-[#1f9a5e] text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest border border-[#1f9a5e]/10">AI Active</span>
@@ -233,9 +233,14 @@ export default function UserScannerPage() {
                       className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none text-sm font-bold text-slate-700"
                     >
                       <option>Surat Masuk</option>
+                      <option>Surat Tugas</option>
+                      <option>Surat Mandat</option>
                       <option>Surat Undangan</option>
-                      <option>Surat Edaran</option>
+                      <option>Surat Permohonan</option>
+                      <option>Proposal</option>
+                      <option>LPJ</option>
                       <option>Surat Keterangan</option>
+                      <option>Surat Instruksi</option>
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -282,7 +287,7 @@ export default function UserScannerPage() {
               <CheckCircle2 size={48} />
             </div>
             <div>
-              <h2 className="text-5xl font-bebas text-slate-800 tracking-tight">Berhasil Disimpan!</h2>
+              <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Berhasil Disimpan!</h2>
               <p className="text-slate-400 mt-2 text-sm font-medium">Data surat telah berhasil didigitalkan dan masuk ke arsip ranting.</p>
             </div>
             <button 

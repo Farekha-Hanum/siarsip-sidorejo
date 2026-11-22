@@ -91,7 +91,7 @@ export default function ScannerPage() {
       {/* Header */}
       <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm overflow-hidden relative">
          <div className="relative z-10">
-          <h1 className="text-4xl font-bebas text-slate-800 tracking-tight">Scanner Surat Masuk</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">Scanner Surat Masuk</h1>
           <p className="text-slate-500 mt-2 max-w-xl">
             Digitalkan surat fisik dengan teknologi OCR. Sistem akan otomatis mendeteksi Nomor Surat, Tanggal, dan Pengirim.
           </p>
@@ -122,7 +122,7 @@ export default function ScannerPage() {
             <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <Camera size={40} />
             </div>
-            <h2 className="text-2xl font-bebas text-slate-800">Ambil Foto atau Pilih Gambar</h2>
+            <h2 className="text-xl font-bold text-slate-800">Ambil Foto atau Pilih Gambar</h2>
             <p className="text-slate-500 mt-2 text-center max-w-sm">
               Klik untuk membuka kamera atau pilih file dari galeri. Pastikan tulisan surat terlihat tajam.
             </p>
@@ -160,7 +160,7 @@ export default function ScannerPage() {
             {/* Verification Form */}
             <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
               <div className="flex items-center justify-between border-b pb-4">
-                <h3 className="text-xl font-bebas text-slate-800">Verifikasi Hasil Scan</h3>
+                <h3 className="text-lg font-bold text-slate-800">Verifikasi Hasil Scan</h3>
                 <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">OCR Selesai</span>
               </div>
 
@@ -215,9 +215,14 @@ export default function ScannerPage() {
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                   >
                     <option>Surat Masuk</option>
+                    <option>Surat Tugas</option>
+                    <option>Surat Mandat</option>
                     <option>Surat Undangan</option>
-                    <option>Surat Edaran</option>
+                    <option>Surat Permohonan</option>
+                    <option>Proposal</option>
+                    <option>LPJ</option>
                     <option>Surat Keterangan</option>
+                    <option>Surat Instruksi</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -256,7 +261,7 @@ export default function ScannerPage() {
           >
             <CheckCircle2 size={80} className="text-green-500" />
             <div>
-              <h2 className="text-4xl font-bebas text-slate-800">Berhasil Disimpan!</h2>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800">Berhasil Disimpan!</h2>
               <p className="text-slate-500 mt-2">Data surat telah masuk ke dalam arsip digital dan siap dikelola.</p>
             </div>
             <button 

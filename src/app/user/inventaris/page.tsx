@@ -58,7 +58,7 @@ export default function UserInventarisPage() {
         <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none text-white"><Package size={140} /></div>
         <div className="relative z-10">
           <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "#80e5b0" }}>✦ Portal Anggota</p>
-          <h1 className="font-bebas text-4xl tracking-tight leading-none">Inventaris Ranting</h1>
+          <h1 className="font-extrabold text-2xl md:text-3xl tracking-tight leading-snug">Inventaris Ranting</h1>
           <p className="text-white/55 mt-1.5 text-sm">Daftar aset dan perlengkapan milik ranting IPNU-IPPNU Sidorejo.</p>
         </div>
       </motion.div>
@@ -95,7 +95,7 @@ export default function UserInventarisPage() {
           <div className="col-span-full py-20 text-center rounded-3xl bg-white"
             style={{ border: "1px solid rgba(31,154,94,0.1)" }}>
             <Package size={48} className="mx-auto mb-3 opacity-20" style={{ color: NU_GREEN }} />
-            <p className="font-bebas text-xl" style={{ color: NU_DARK }}>
+            <p className="font-bold text-xl" style={{ color: NU_DARK }}>
               {search ? "Barang Tidak Ditemukan" : "Belum Ada Data Inventaris"}
             </p>
           </div>

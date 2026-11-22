@@ -59,7 +59,7 @@ export default function AdminDashboard() {
       .order("created_at", { ascending: false }).limit(3);
 
     if (recentSurat) {
-      setRecentActivities(recentSurat.map(s => ({
+      setRecentActivities(recentSurat.map((s: any) => ({
         title: s.perihal,
         time: s.created_at ? (() => { try { const d = new Date(s.created_at); return isNaN(d.getTime()) ? "-" : d.toLocaleDateString("id-ID"); } catch { return "-"; } })() : "-",
         desc: "Dokumen berhasil diarsipkan ke dalam sistem.",
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
               ✦ Panel Admin
             </span>
           </div>
-          <h1 className="font-bebas text-5xl md:text-6xl tracking-tight leading-none mb-3">
+          <h1 className="font-extrabold text-3xl md:text-4xl tracking-tight leading-tight mb-3">
             Dashboard <span style={{ color: NU_GOLD }}>SIMPEL NU</span>
           </h1>
           <p className="text-white/60 max-w-xl text-base leading-relaxed mb-8">
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
             <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "#94a3b8" }}>
               {stat.label}
             </p>
-            <h3 className="font-bebas text-4xl tracking-tight" style={{ color: NU_DARK }}>
+            <h3 className="font-extrabold text-3xl tracking-tight" style={{ color: NU_DARK }}>
               {loading ? (
                 <span className="inline-block w-12 h-8 rounded animate-pulse" style={{ background: "#e2e8f0" }} />
               ) : stat.value}
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(31,154,94,0.1)" }}>
               <Clock size={18} style={{ color: NU_GREEN }} />
             </div>
-            <h3 className="font-bebas text-xl tracking-tight" style={{ color: NU_DARK }}>Log Aktivitas Terakhir</h3>
+            <h3 className="font-bold text-lg tracking-tight" style={{ color: NU_DARK }}>Log Aktivitas Terakhir</h3>
           </div>
           <div className="p-6 space-y-2">
             {recentActivities.length > 0 ? (
@@ -196,7 +196,7 @@ export default function AdminDashboard() {
             style={{ background: `linear-gradient(145deg, ${NU_DARK}, ${NU_GREEN})`, boxShadow: `0 8px 40px rgba(31,154,94,0.25)` }}>
             <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#80e5b0" }}>✦ Akses Cepat</p>
             <div className="space-y-2">
-              <QuickLink href="/admin/validasi" label="Validasi Poin"  icon={ShieldCheck} />
+              <QuickLink href="/admin/validasi" label="Validasi Kegiatan"  icon={ShieldCheck} />
               <QuickLink href="/admin/inventaris" label="Cek Inventaris" icon={Package} />
               <QuickLink href="/admin/pengurus" label="Data Pengurus"  icon={Users} />
             </div>

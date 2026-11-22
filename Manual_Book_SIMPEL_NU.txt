@@ -28,6 +28,7 @@ BAB 4: ADMINISTRASI
 4.1 Manajemen Pengguna ....................................................... 35  
 4.2 Backup & Restore ................................................................ 42  
 
+
 BAB 5: TROUBLESHOOTING & FAQ  
 5.1 Troubleshooting ................................................................. 48  
 5.2 FAQ ....................................................................................... 52  
@@ -152,13 +153,13 @@ Bagi Anggota (User):
 [SCREENSHOT: Halaman Daftar Kegiatan bagi User]
 
 Bagi Admin:
-1. Buka menu "Reward Anggota".
-2. Tinjau daftar kehadiran yang diajukan oleh pengurus.
+1. Daftar Kegiatan & Partisipasi: Buka menu "Kegiatan" untuk melihat seluruh kegiatan, memantau persentase partisipasi & rasio keberhasilan tiap kegiatan, mengunduh file spreadsheet rekap via tombol "Ekspor Rekap (.xlsx)", serta mengklik tombol "Lihat Daftar Peserta" untuk melihat nama anggota, organisasi, waktu konfirmasi, filter status (Hadir/Menunggu/Ditolak), dan tombol "Unduh Excel (.xlsx)".
+2. Validasi Kegiatan: Buka menu "Validasi Kegiatan" untuk menyetujui (Approve) atau menolak kehadiran anggota yang masuk dalam antrean.
 3. Klik "Approve" untuk memberikan poin secara otomatis ke profil anggota tersebut.
-[SCREENSHOT: Panel Validasi Kehadiran bagi Admin]
+[SCREENSHOT: Panel Daftar Kegiatan & Rincian Peserta bagi Admin]
 
 Leaderboard:
-Setiap kehadiran bernilai poin tertentu. Anggota yang mencapai target 70 Poin akan mendapatkan gelar "Anggota Terbest" dan berhak mendapatkan sertifikat digital otomatis dari sistem.
+Setiap kehadiran bernilai poin tertentu. Anggota yang mencapai target 70 Poin akan mendapatkan gelar "Anggota Tergiat" dan berhak mendapatkan sertifikat digital otomatis dari sistem.
 [SCREENSHOT: Papan Peringkat / Leaderboard Anggota]
 
 3.4 Pengaturan & Profil
